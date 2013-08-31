@@ -2,62 +2,55 @@
  * Author: Chris Boler
  * christopher.boler@gmail.com
  * 8/15/2012
+ * The concept of 'smack' was conceived years ago
+ * by myself with the help of Joshua Lindsay widerightturns13@yahoo.com
  */
-
 /**
  * Player: Class containing information about the player
  */
 var Player = {
-	
 	/**
 	 * Default option configuration
 	 */
-	_options: {
+	opts: {
 		debug: false,
 		color: 'black',
 		number: 1
 	},
-	
 	number: 1,
-	
 	/**
 	 * Set of cards in the player's hand
 	 */
 	hand: [],
-	
 	/**
 	 * Initialization function that sets options
 	 * @param {Object} options: { debug, color }
 	 */
-	init: function(options) {
+	init: function (options) {
 		var self = this;
 		// Apply options
-		$.extend(true, self._options, options);
-		self.number = self._options.number;
-		
+		$.extend(true, self.opts, options);
+		self.number = self.opts.number;
 		// Enable debug logging
-		if(self._options.debug) {
-			self.log = function(str) {
+		if (self.opts.debug) {
+			self.log = function (str) {
 				try { // prevent error
-					if(typeof window.console !== undefined && typeof window.console.log !== undefined) {
+					if (window.console !== undefined && window.console.log !== undefined) {
 						console.log(str);
 					}
-				} catch(e) {
+				} catch (e) {
 					alert('[Player:' + self.number + '.Init Debug] logging not possible.');
 				}
 			};
 			self.log('[Player:' + self.number + '.Init] Debugging enabled.');
 		}
-		
 		self.log('[Player:' + self.number + '.Init] Done.');
-		
 		return self;
 	},
-	
 	/**
 	 * Overridden to perform console logging if options.debug is set to true.
 	 */
-	log: function() {},
+	log: function () {}
 };
 
 /**
@@ -66,17 +59,15 @@ var Player = {
  * @param {Object} self: Engine
  * @param {Object} $: jQuery
  */
-var Engine = (function(self, $) {
-	
+var Engine = (function (self, $) {
 	/**
 	 * Default option configuration
 	 */
-	var _options = {
+	var opts = {
 		debug: false,
 		game: undefined,
 		playerCount: 2
 	};
-	
 	/**
 	 * The set of unused cards that have yet to be dealt.
 	 */
@@ -134,44 +125,38 @@ var Engine = (function(self, $) {
 		51 : 'hearts 12',
 		52 : 'hearts 13'
 	}];
-	
 	/**
 	 * The set of used cards removed from play.
 	 */
 	self.discard = [];
-	
 	/**
 	 * The set of players, used to keep up with hands.
 	 */
 	self.players = [];
-	
 	/**
 	 * Initialization function that sets options
 	 * @param {Object} options: { debug }
 	 */
-	self.init = function(options) {
+	self.init = function (options) {
 		// Apply options
-		$.extend(true, _options, options);
+		$.extend(true, opts, options);
 
 		// Enable debug logging
-		if(_options.debug) {
-			self.log = function(str) {
+		if (opts.debug) {
+			self.log = function (str) {
 				try { // prevent error
-					if(typeof window.console !== undefined && typeof window.console.log !== undefined) {
+					if (window.console !== undefined && window.console.log !== undefined) {
 						console.log(str);
 					}
-				} catch(e) {
+				} catch (e) {
 					alert('[Engine.Init Debug] logging not possible.');
 				}
 			};
 			self.log('[Engine.Init] Debugging enabled.');
 		}
-		
 		self.play();
-		
 		self.log('[Engine.Init] Done.');
 	};
-	
 	/**
 	 * Array shuffling function from
 	 * http://bost.ocks.org/mike/shuffle/
@@ -181,43 +166,55 @@ var Engine = (function(self, $) {
 	 * of the Fisher-Yates shuffle.
 	 * @param {array} array: the array to shuffle
 	 */
-	 self.shuffle = function shuffle(array) {
+	self.shuffle = function shuffle(array) {
 		var m = array.length, t, i;
-
 		// While there remain elements to shuffle…
 		while (m) {
-
 			// Pick a remaining element…
 			i = Math.floor(Math.random() * m--);
-
 			// And swap it with the current element.
 			t = array[m];
 			array[m] = array[i];
 			array[i] = t;
 		}
-
 		return array;
 	}
-
-	
-	self.play = function(){
+	/**
+	 * Begins the game
+	 */
+	self.play = function (){
 		// Set up game options/rules. This is where you would extend for more games.
-		switch(_options.game){
+		switch (_options.game){
 			case 'smack':
-				self.log('[Engine.Init] Starting Smack.');								
+				self.log('[Engine.Init] Starting Smack.');
+				// Define variables
+				var oCardsLeft = $('#opponent-progressbar'),
+				pCardsLeft = $('#player-progressbar'),
+				oDeck = $('#oDeck'),
+				pDeck = $('#pDeck'),
+				oDraw = $('#oDraw'),
+				pDraw = $('#pDraw'),
+				oChallenge = $('#oChallenge'),
+				pChallenge = $('#pChallenge'),
+				oB1 = $('#oB1'),
+				pB1 = $('#pB1'),
+				oB2 = $('#oB2'),
+				pB2 = $('#pB2'),
+				oB3 = $('#oB3'),
+				pB3 = $('#pB3');
 				// Split the deck at 26, give red to one player and black to the other
-				if(_options.playerCount !== 2){
+				if (_options.playerCount !== 2){
 					alert('[Engine.play] Invalid player count.');
 				}
 				var playerColor = _options.color;
-				for(var i = 0; i < _options.playerCount; i++){
+				for (var i = 0; i < _options.playerCount; i++) {
 					// Player 0 is the human
 					if (i == 1) {
 						playerColor = 'red';
 					}					
 					self.players[i] = Player.init({ debug: true, number: i });
 					// Default to black, allow choosing later
-					switch(playerColor){
+					switch (playerColor) {
 						case 'red':
 							self.players[i].hand = [{
 								1: 'spades 1',
@@ -282,8 +279,6 @@ var Engine = (function(self, $) {
 					self.players[i].hand = self.shuffle(self.players[i].hand);
 				}
 				// Begin turns and check rules for each action
-				
-				
 				break;
 			case undefined:
 				alert('[Engine.Init] No game type defined, you stupid twonk.');
@@ -293,14 +288,13 @@ var Engine = (function(self, $) {
 				break;
 		}
 	};
-	
 	/**
 	 * Visually sets a card to a specific value in the face-up state.
 	 * @param {Object} card: CSS selector for the card element. (#cardId)
 	 * @param {Object} suite: 'spades' or 'clubs' or 'diams' or 'hearts'
 	 * @param {Object} value: 1-13 or 'ace' - 'king' or 'one' - 'thirteen'
 	 */
-	self.setCard = function(card, suite, value) {
+	self.setCard = function (card, suite, value) {
 		self.log('[Engine.setCard] $(card).length:' + $(card).length);
 		if ($(card).length > 0 && (suite == 'spades' || suite == 'clubs' || suite == 'diams' || suite == 'hearts')) {
 			self.log('[Engine.setCard] card exists and valid suite.');
@@ -516,22 +510,19 @@ var Engine = (function(self, $) {
 			}
 		}
 	};
-	
 	/**
 	 * Visually clears a card, returning it to the face-down state.
 	 * @param {Object} card: CSS selector for the card element. (#cardId)
 	 */
-	self.clearCard = function(card){
+	self.clearCard = function (card){
 		if ($(card).length > 0) {
 			self.log('[Engine.clearCard] card exists.');
 			$(card).empty();
 		}
 	};
-	
 	/**
 	 * Overridden to perform console logging if options.debug is set to true.
 	 */
-	self.log = function() {};
-
+	self.log = function () {};
 	return self;
 }(Engine || {}, jQuery));
