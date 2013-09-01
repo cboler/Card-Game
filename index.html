@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+        <title>Smack.test</title>
+        <script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'>
+        </script>
+        <script type='text/javascript' src='app/app.js'>
+        </script>
+        <link rel='stylesheet' type='text/css' href='app.css'></link>
+    </head>
+    <body style='background-color:#3E955B;'>
+        <script type='text/javascript'>
+            $(document).ready(function(){
+				Engine.init({ debug: true, game: 'smack' });
+            });
+        </script>
+        <div id='header'>
+	        <div id='playerframe'>
+				<h2>Opponent</h2>
+		        <div id='progressbar'>
+			      <div>26/26</div>
+			    </div>
+		    </div>
+	    </div>
+        <div id='opponent-div'>
+            <div id='oDeck' class='card'>
+            </div>
+            <div id='oDraw' class='card'  style='position:relative;left:4em;top:4em;'>
+            </div>
+            <div id='oChallenge' class='card'  style='position:relative;left:8em;top:4em;'>
+            </div>
+            <div id='oB1' class='card' style='position:relative;left:12em;top:4em;'>
+            </div>
+            <div id='oB2' class='card' style='position:relative;left:16em;top:4em;'>
+            </div>
+            <div id='oB3' class='card' style='position:relative;left:20em;top:4em;'>
+            </div>
+        </div>
+		<div id='player-div'>
+		    <div id='pDeck' class='card'>
+            </div>
+            <div id='pDraw' class='card' style='position:relative;left:4em;top:4em;'>
+			</div>
+			<div id='pChallenge' class='card' style='position:relative;left:8em;top:4em;'>
+            </div>
+			<div id='pB1' class='card' style='position:relative;left:12em;top:4em;'>
+            </div>
+			<div id='pB2' class='card' style='position:relative;left:16em;top:4em;'>
+            </div>
+			<div id='pB3' class='card' style='position:relative;left:20em;top:4em;'>
+            </div>
+		</div>
+        <div id='footer'>
+	        <div id='playerframe'>
+				<h2>Player</h2>
+		        <div id='progressbar'>
+			      <div>26/26</div>
+			    </div>
+		    </div>
+	    </div>
+    </body>
+</html>
