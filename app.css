@@ -1,5 +1,5 @@
 ﻿.card {
-  border-left: 1px solid #808080;
+	border-left: 1px solid #808080;
 	border-right: 1px solid #000000;
 	border-top: 1px solid #808080;
 	border-bottom: 1px solid #000000;
@@ -67,12 +67,18 @@
 	display: none;
 }
 
+.clickable {
+	cursor: pointer;
+}
+
 html {
 	height: 100%;
+	overflow: hidden;
 }
 
 body {
 	height: 100%;
+	overflow: hidden;
 }
 
 #playerframe {
@@ -147,6 +153,7 @@ body {
 	margin-right: auto;
 	width: 80%;
 	height: 50%;
+	border-bottom: 1px solid black;
 }
 
 #player-div {
@@ -154,52 +161,79 @@ body {
 	margin-right: auto;
 	width: 80%;
 	height: 50%;
+	border-top: 1px solid black;
 }
 
 .opponent-deck {
-
+	position: absolute;
+	top: 8em;
 }
 
 .opponent-draw{
-
+	position: absolute;
+	top: 8em;
+	left: 12em;
+	z-index: 1;
 }
 
 .opponent-challenge {
-
+	position: absolute;
+	top: 8em;
+	left: 14em;
+	z-index: 2;
 }
 
 .opponent-b1 {
-
+	position: absolute;
+	top: 8em;
+	left: 20em;
 }
 
 .opponent-b2 {
-
+	position: absolute;
+	top: 8em;
+	left: 26em;
 }
 
 .opponent-b3 {
-
+	position: absolute;
+	top: 8em;
+	left: 32em;
 }
 
 .player-deck {
-
+	position: absolute;
+	top: 21em;
 }
 
 .player-draw {
-
+	position: absolute;
+	top: 21em;
+	left: 12em;
+	z-index: 1;
 }
 
 .player-challenge{
-
+	position: absolute;
+	top: 21em;
+	left: 14em;
+	z-index: 2;
 }
 
 .player-b1 {
-
+	position: absolute;
+	top: 21em;
+	left: 20em;
 }
 
 .player-b2 {
-
+	position: absolute;
+	top: 21em;
+	left: 26em;
 }
 
 .player-b3{
-
+	position: absolute;
+	top: 21em;
+	left: 32em;
 }

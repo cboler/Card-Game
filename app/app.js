@@ -8,29 +8,37 @@
 /**
  * Player: Class containing information about the player
  */
-var Player = {
+function Player() {
 	/**
 	 * Default option configuration
 	 */
-	opts: {
+	this.opts = {
 		debug: false,
 		color: 'black',
 		number: 1
-	},
-	number: 1,
+	};
+	/**
+	 *
+	 */
+	this.number = 1;
+	/**
+	 *
+	 */
+	this.color = 'black';
 	/**
 	 * Set of cards in the player's hand
 	 */
-	hand: [],
+	this.hand = [];
 	/**
 	 * Initialization function that sets options
 	 * @param {Object} options: { debug, color }
 	 */
-	init: function (options) {
+	this.init = function (options) {
 		var self = this;
 		// Apply options
 		$.extend(true, self.opts, options);
 		self.number = self.opts.number;
+		self.color = self.opts.color;
 		// Enable debug logging
 		if (self.opts.debug) {
 			self.log = function (str) {
@@ -46,11 +54,11 @@ var Player = {
 		}
 		self.log('[Player:' + self.number + '.Init] Done.');
 		return self;
-	},
+	};
 	/**
 	 * Overridden to perform console logging if options.debug is set to true.
 	 */
-	log: function () {}
+	this.log = function () {};
 };
 
 /**
@@ -178,13 +186,14 @@ var Engine = (function (self, $) {
 			array[i] = t;
 		}
 		return array;
+		self.log('[Engine.shuffle] shuffle completed.');
 	}
 	/**
 	 * Begins the game
 	 */
 	self.play = function (){
 		// Set up game options/rules. This is where you would extend for more games.
-		switch (_options.game){
+		switch (opts.game){
 			case 'smack':
 				self.log('[Engine.Init] Starting Smack.');
 				// Define variables
@@ -202,83 +211,91 @@ var Engine = (function (self, $) {
 				pB2 = $('#pB2'),
 				oB3 = $('#oB3'),
 				pB3 = $('#pB3');
-				// Split the deck at 26, give red to one player and black to the other
-				if (_options.playerCount !== 2){
+				if (opts.playerCount !== 2){
 					alert('[Engine.play] Invalid player count.');
 				}
-				var playerColor = _options.color;
-				for (var i = 0; i < _options.playerCount; i++) {
-					// Player 0 is the human
-					if (i == 1) {
-						playerColor = 'red';
-					}					
-					self.players[i] = Player.init({ debug: true, number: i });
-					// Default to black, allow choosing later
-					switch (playerColor) {
-						case 'red':
-							self.players[i].hand = [{
-								1: 'spades 1',
-								2: 'spades 2',
-								3: 'spades 3',
-								4: 'spades 4',
-								5: 'spades 5',
-								6: 'spades 6',
-								7: 'spades 7',
-								8: 'spades 8',
-								9: 'spades 9',
-								10: 'spades 10',
-								11: 'spades 11',
-								12: 'spades 12',
-								13: 'spades 13',
-								14: 'clubs 1',
-								15: 'clubs 2',
-								16: 'clubs 3',
-								17: 'clubs 4',
-								18: 'clubs 5',
-								19: 'clubs 6',
-								20: 'clubs 7',
-								21: 'clubs 8',
-								22: 'clubs 9',
-								23: 'clubs 10',
-								24: 'clubs 11',
-								25: 'clubs 12',
-								26: 'clubs 13'
-							}];
-							break;
-						default:
-							self.players[i].hand = [{
-								1 : 'diams 1',
-								2 : 'diams 2',
-								3 : 'diams 3',
-								4 : 'diams 4',
-								5 : 'diams 5',
-								6 : 'diams 6',
-								7 : 'diams 7',
-								8 : 'diams 8',
-								9 : 'diams 9',
-								10 : 'diams 10',
-								11 : 'diams 11',
-								12 : 'diams 12',
-								13 : 'diams 13',
-								14 : 'hearts 1',
-								15 : 'hearts 2',
-								16 : 'hearts 3',
-								17 : 'hearts 4',
-								18 : 'hearts 5',
-								19 : 'hearts 6',
-								20 : 'hearts 7',
-								21 : 'hearts 8',
-								22 : 'hearts 9',
-								23 : 'hearts 10',
-								24 : 'hearts 11',
-								25 : 'hearts 12',
-								26 : 'hearts 13'
-							}];
-							break;
-					}
-					self.players[i].hand = self.shuffle(self.players[i].hand);
-				}
+				// Player 1 is the human				
+				self.players[1] = new Player();
+				self.players[1].init({debug: true, number: 1, color: 'red' });
+				self.log('[Engine.Init] Setting up red player.');
+				self.players[1].hand[0] = 'diams 1';
+				self.players[1].hand[1] = 'diams 2';
+				self.players[1].hand[2] = 'diams 3';
+				self.players[1].hand[3] = 'diams 4';
+				self.players[1].hand[4] = 'diams 5';
+				self.players[1].hand[5] = 'diams 6';
+				self.players[1].hand[6] = 'diams 7';
+				self.players[1].hand[7] = 'diams 8';
+				self.players[1].hand[8] = 'diams 9';
+				self.players[1].hand[9] = 'diams 10';
+				self.players[1].hand[10] = 'diams 11';
+				self.players[1].hand[11] = 'diams 12';
+				self.players[1].hand[12] = 'diams 13';
+				self.players[1].hand[13] = 'hearts 1';
+				self.players[1].hand[14] = 'hearts 2';
+				self.players[1].hand[15] = 'hearts 3';
+				self.players[1].hand[16] = 'hearts 4';
+				self.players[1].hand[17] = 'hearts 5';
+				self.players[1].hand[18] = 'hearts 6';
+				self.players[1].hand[19] = 'hearts 7';
+				self.players[1].hand[20] = 'hearts 8';
+				self.players[1].hand[21] = 'hearts 9';
+				self.players[1].hand[22] = 'hearts 10';
+				self.players[1].hand[23] = 'hearts 11';
+				self.players[1].hand[24] = 'hearts 12';
+				self.players[1].hand[25] = 'hearts 13';
+				self.players[1].hand = self.shuffle(self.players[1].hand);
+				self.players[2] = new Player();
+				self.players[2].init({ debug: true, number: 2, color: 'black' });
+				self.log('[Engine.Init] Setting up black player.');
+				self.players[2].hand[0] = 'spades 1';
+				self.players[2].hand[1] = 'spades 2';
+				self.players[2].hand[2] = 'spades 3';
+				self.players[2].hand[3] = 'spades 4';
+				self.players[2].hand[4] = 'spades 5';
+				self.players[2].hand[5] = 'spades 6';
+				self.players[2].hand[6] = 'spades 7';
+				self.players[2].hand[7] = 'spades 8';
+				self.players[2].hand[8] = 'spades 9';
+				self.players[2].hand[9] = 'spades 10';
+				self.players[2].hand[10] = 'spades 11';
+				self.players[2].hand[11] = 'spades 12';
+				self.players[2].hand[12] = 'spades 13';
+				self.players[2].hand[13] = 'clubs 1';
+				self.players[2].hand[14] = 'clubs 2';
+				self.players[2].hand[15] = 'clubs 3';
+				self.players[2].hand[16] = 'clubs 4';
+				self.players[2].hand[17] = 'clubs 5';
+				self.players[2].hand[18] = 'clubs 6';
+				self.players[2].hand[19] = 'clubs 7';
+				self.players[2].hand[20] = 'clubs 8';
+				self.players[2].hand[21] = 'clubs 9';
+				self.players[2].hand[22] = 'clubs 10';
+				self.players[2].hand[23] = 'clubs 11';
+				self.players[2].hand[24] = 'clubs 12';
+				self.players[2].hand[25] = 'clubs 13';
+				self.players[2].hand = self.shuffle(self.players[2].hand);
+				var p1CardsLeft = self.players[1].hand.length,
+				p2CardsLeft = self.players[2].hand.length,
+				p1Hand = self.players[1].hand,
+				p2Hand = self.players[2].hand;
 				// Begin turns and check rules for each action
+				pDeck.click(function () {
+					self.log('[Engine.Init] Player deck clicked.');
+					pDraw.removeClass('hidden');
+					self.setCard('#pDraw', p1Hand[1].split(' ')[0], p1Hand[1].split(' ')[1]);
+					oDraw.removeClass('hidden');
+					self.setCard('#oDraw', p2Hand[1].split(' ')[0], p2Hand[1].split(' ')[1])
+				});
+				oB1.click(function () {
+					self.log('[Engine.Init] oB1 clicked.');
+				});
+				oB2.click(function () {
+					self.log('[Engine.Init] oB2 clicked.');
+				});
+				oB3.click(function () {
+					self.log('[Engine.Init] oB3 clicked.');
+				});
 				break;
 			case undefined:
 				alert('[Engine.Init] No game type defined, you stupid twonk.');
@@ -295,7 +312,7 @@ var Engine = (function (self, $) {
 	 * @param {Object} value: 1-13 or 'ace' - 'king' or 'one' - 'thirteen'
 	 */
 	self.setCard = function (card, suite, value) {
-		self.log('[Engine.setCard] $(card).length:' + $(card).length);
+		self.log('[Engine.setCard] suite:' + suite + ' value: ' + value);
 		if ($(card).length > 0 && (suite == 'spades' || suite == 'clubs' || suite == 'diams' || suite == 'hearts')) {
 			self.log('[Engine.setCard] card exists and valid suite.');
 			$(card).empty();
