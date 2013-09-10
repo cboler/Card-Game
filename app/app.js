@@ -195,7 +195,10 @@ var Engine = (function (self, $) {
 		// Set up game options/rules. This is where you would extend for more games.
 		switch (opts.game){
 			case 'smack':
-				self.log('[Engine.Init] Starting Smack.');
+				if (opts.playerCount !== 2){
+					alert('[Engine.play] Invalid player count.');
+				}		
+				self.log('[Engine.play] Starting Smack.');
 				// Define variables
 				var oCardsLeft = $('#opponent-progressbar'),
 				pCardsLeft = $('#player-progressbar'),
@@ -210,14 +213,12 @@ var Engine = (function (self, $) {
 				oB2 = $('#oB2'),
 				pB2 = $('#pB2'),
 				oB3 = $('#oB3'),
-				pB3 = $('#pB3');
-				if (opts.playerCount !== 2){
-					alert('[Engine.play] Invalid player count.');
-				}
-				// Player 1 is the human				
+				pB3 = $('#pB3'),
+				pIndex = 0,
+				oIndex = 0;
 				self.players[1] = new Player();
 				self.players[1].init({debug: true, number: 1, color: 'red' });
-				self.log('[Engine.Init] Setting up red player.');
+				self.log('[Engine.play] Setting up red player.');
 				self.players[1].hand[0] = 'diams 1';
 				self.players[1].hand[1] = 'diams 2';
 				self.players[1].hand[2] = 'diams 3';
@@ -247,7 +248,7 @@ var Engine = (function (self, $) {
 				self.players[1].hand = self.shuffle(self.players[1].hand);
 				self.players[2] = new Player();
 				self.players[2].init({ debug: true, number: 2, color: 'black' });
-				self.log('[Engine.Init] Setting up black player.');
+				self.log('[Engine.play] Setting up black player.');
 				self.players[2].hand[0] = 'spades 1';
 				self.players[2].hand[1] = 'spades 2';
 				self.players[2].hand[2] = 'spades 3';
@@ -281,27 +282,50 @@ var Engine = (function (self, $) {
 				p2Hand = self.players[2].hand;
 				// Begin turns and check rules for each action
 				pDeck.click(function () {
-					self.log('[Engine.Init] Player deck clicked.');
-					pDraw.removeClass('hidden');
-					self.setCard('#pDraw', p1Hand[1].split(' ')[0], p1Hand[1].split(' ')[1]);
-					oDraw.removeClass('hidden');
-					self.setCard('#oDraw', p2Hand[1].split(' ')[0], p2Hand[1].split(' ')[1])
+					self.log('[Engine.play] Player deck clicked.');
+					var p1Card = p1Hand[pIndex],
+					p2Card = p2Hand[oIndex];
+					pDraw.slideDown('slow');
+					self.setCard('#pDraw', p1Card.split(' ')[0], p1Card.split(' ')[1]);
+					oDraw.slideDown('slow');
+					self.setCard('#oDraw', p2Card.split(' ')[0], p2Card.split(' ')[1]);
+					// if card values are the same
+					if (p1Card.split(' ')[1] === p2Card.split(' ')[1]) {
+						// draw the next 3 and put them in the B slots
+						
+					} else {
+						// handle aces
+						if (p1Card.split(' ')[1] === '1') {
+							// if opponent's card is anything other than 2, win
+							
+						} else if (p2Card.split(' ')[1] === '1') {
+							// if opponent's card is anything other than 2, win
+							
+						} else if (p1Card.split(' ')[1] > p2Card.split(' ')[1]) {
+							// 
+							self.discard.push(p2Card);
+							
+						} else if (p1Card.split(' ')[1] < p2Card.split(' ')[1]) {
+							self.discard(push(p1Card);
+							
+						}
+					}
 				});
 				oB1.click(function () {
-					self.log('[Engine.Init] oB1 clicked.');
+					self.log('[Engine.play] oB1 clicked.');
 				});
 				oB2.click(function () {
-					self.log('[Engine.Init] oB2 clicked.');
+					self.log('[Engine.play] oB2 clicked.');
 				});
 				oB3.click(function () {
-					self.log('[Engine.Init] oB3 clicked.');
+					self.log('[Engine.play] oB3 clicked.');
 				});
 				break;
 			case undefined:
-				alert('[Engine.Init] No game type defined, you stupid twonk.');
+				alert('[Engine.play] No game type defined, you stupid twonk.');
 				break;
 			default:
-				alert('[Engine.Init] Invalid game type, asshole.');
+				alert('[Engine.play] Invalid game type, asshole.');
 				break;
 		}
 	};
