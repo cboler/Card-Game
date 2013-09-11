@@ -200,8 +200,8 @@ var Engine = (function (self, $) {
 				}		
 				self.log('[Engine.play] Starting Smack.');
 				// Define variables
-				var oCardsLeft = $('#opponent-progressbar'),
-				pCardsLeft = $('#player-progressbar'),
+				var oCardsLeft = $('#opponent-progressbar div'),
+				pCardsLeft = $('#player-progressbar div'),
 				oDeck = $('#oDeck'),
 				pDeck = $('#pDeck'),
 				oDraw = $('#oDraw'),
@@ -215,7 +215,9 @@ var Engine = (function (self, $) {
 				oB3 = $('#oB3'),
 				pB3 = $('#pB3'),
 				pIndex = 0,
-				oIndex = 0;
+				oIndex = 0,
+				inBattle = false,
+				inChallenge = false;
 				self.players[1] = new Player();
 				self.players[1].init({debug: true, number: 1, color: 'red' });
 				self.log('[Engine.play] Setting up red player.');
@@ -280,6 +282,7 @@ var Engine = (function (self, $) {
 				p2CardsLeft = self.players[2].hand.length,
 				p1Hand = self.players[1].hand,
 				p2Hand = self.players[2].hand;
+				pDeck.addClass('glow');
 				// Begin turns and check rules for each action
 				pDeck.click(function () {
 					self.log('[Engine.play] Player deck clicked.');
@@ -289,36 +292,91 @@ var Engine = (function (self, $) {
 					self.setCard('#pDraw', p1Card.split(' ')[0], p1Card.split(' ')[1]);
 					oDraw.slideDown('slow');
 					self.setCard('#oDraw', p2Card.split(' ')[0], p2Card.split(' ')[1]);
+					pDeck.removeClass('glow');
+					// TODO: NEED TO USE PARSEINT, RIGHT NOW IT'S COMPARING TEXT VALUES...
 					// if card values are the same
 					if (p1Card.split(' ')[1] === p2Card.split(' ')[1]) {
-						// draw the next 3 and put them in the B slots
-						
-					} else {
-						// handle aces
-						if (p1Card.split(' ')[1] === '1') {
-							// if opponent's card is anything other than 2, win
-							
-						} else if (p2Card.split(' ')[1] === '1') {
-							// if opponent's card is anything other than 2, win
-							
-						} else if (p1Card.split(' ')[1] > p2Card.split(' ')[1]) {
-							// 
-							self.discard.push(p2Card);
-							
-						} else if (p1Card.split(' ')[1] < p2Card.split(' ')[1]) {
-							self.discard(push(p1Card);
-							
+						// draw the next 3 and put them in the B slots for each player
+						oIndex += 1;
+						p2Card = p2Hand[oIndex];
+						oB1.slideDown('slow', function () {
+							$(this).addClass('glow');
+						});
+						self.setCard('#oB1', p2Card.split(' ')[0], p2Card.split(' ')[1]);
+						oIndex += 1;
+						p2Card = p2Hand[oIndex];
+						oB2.slideDown('slow', function () {
+							$(this).addClass('glow');
+						});
+						self.setCard('#oB2', p2Card.split(' ')[0], p2Card.split(' ')[1]);
+						oIndex += 1;
+						p2Card = p2Hand[oIndex];
+						oB3.slideDown('slow', function () {
+							$(this).addClass('glow');
+						});
+						self.setCard('#oB3', p2Card.split(' ')[0], p2Card.split(' ')[1]);
+						pIndex += 1;
+						p1Card = p1Hand[pIndex];
+						pB1.slideDown('slow');
+						self.setCard('#pB1', p1Card.split(' ')[0], p1Card.split(' ')[1]);
+						pIndex += 1;
+						p1Card = p1Hand[pIndex];
+						pB2.slideDown('slow');
+						self.setCard('#pB2', p1Card.split(' ')[0], p1Card.split(' ')[1]);
+						pIndex += 1;
+						p1Card = p1Hand[pIndex];
+						pB3.slideDown('slow');
+						self.setCard('#pB3', p1Card.split(' ')[0], p1Card.split(' ')[1]);
+						// Then wait for decision click
+					// If player 1 pulled an ace
+					} else if (p1Card.split(' ')[1] === '1') {
+						// if opponent's card is anything other than 2, win
+						if (p2Card.split(' ')[1] === '2') {
+							// no challenge--Player 1 loses
 						}
+					// If player 2 pulled an ace
+					} else if (p2Card.split(' ')[1] === '1') {
+						// if opponent's card is anything other than 2, win
+						if (p1Card.split(' ')[1] === '2') {
+							// no challenge--Player 2 loses
+						}
+					} else if (p1Card.split(' ')[1] > p2Card.split(' ')[1]) {
+						// Player 1 wins, Player 2 can challenge 
+						// Determine probabilities that Player 2 might challenge
+						
+						// If no challenge
+						oDraw.fadeOut('slow');
+						oCardsLeft.attr('width', ((26-1)*100).toString() + '%');
+						oCardsLeft.text('25/26');
+					} else {
+						// Player 2 wins, Player 1 can challenge
+						pDraw.addClass('glow').addClass('clickable');
+						pDeck.addClass('glow');
 					}
+				});
+				pDraw.click(function () {
+					// Challenge initiated
 				});
 				oB1.click(function () {
 					self.log('[Engine.play] oB1 clicked.');
+					oB1.removeClass('glow');
+					oB2.removeClass('glow');
+					oB3.removeClass('glow');
+					
 				});
 				oB2.click(function () {
 					self.log('[Engine.play] oB2 clicked.');
+					oB1.removeClass('glow');
+					oB2.removeClass('glow');
+					oB3.removeClass('glow');
+					
 				});
 				oB3.click(function () {
 					self.log('[Engine.play] oB3 clicked.');
+					oB1.removeClass('glow');
+					oB2.removeClass('glow');
+					oB3.removeClass('glow');
+					
 				});
 				break;
 			case undefined:

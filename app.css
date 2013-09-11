@@ -72,9 +72,9 @@
 }
 
 .glow {
-	-webkit-box-shadow:0 0 1em gold; 
-    -moz-box-shadow: 0 0 1em gold; 
-	box-shadow: 0 0 1em gold;
+	-webkit-box-shadow:0 0 1em blue; 
+    -moz-box-shadow: 0 0 1em blue; 
+	box-shadow: 0 0 1em blue;
 }
 
 html {
