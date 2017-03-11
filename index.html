@@ -1,63 +1,101 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
-        <title>Smack.test</title>
-        <script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'>
-        </script>
-        <script type='text/javascript' src='app/app.js'>
-        </script>
-        <link rel='stylesheet' type='text/css' href='app.css'></link>
-    </head>
-    <body style='background-color:#3E955B;'>
-        <script type='text/javascript'>
-            $(document).ready(function(){
-				Engine.init({ debug: true, game: 'smack' });
-            });
-        </script>
-        <div id='header'>
-	        <div id='playerframe'>
-				<h2>Opponent</h2>
-		        <div id='opponent-progressbar'>
-			      <div>26/26</div>
-			    </div>
-		    </div>
-	    </div>
-        <div id='opponent-div'>
-            <div id='oDeck' class='card opponent-deck'>
+<html ng-app="">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smack</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular.min.js"></script>
+    <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.5/material.blue_grey-teal.min.css" />
+    <script src="https://storage.googleapis.com/code.getmdl.io/1.0.5/material.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <link rel="stylesheet" href="app.css" />
+</head>
+
+<body>
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+        <header class="mdl-layout__header">
+            <div class="mdl-layout__header-row">
+                <!-- Title -->
+                <span class="mdl-layout-title">Title</span>
+                <!-- Add spacer, to align navigation to the right -->
+                <div class="mdl-layout-spacer"></div>
+                <!-- Navigation. We hide it in small screens. -->
+                <nav class="mdl-navigation mdl-layout--large-screen-only">
+                    <a class="mdl-navigation__link" href="">Link</a>
+                    <a class="mdl-navigation__link" href="">Link</a>
+                    <a class="mdl-navigation__link" href="">Link</a>
+                    <a class="mdl-navigation__link" href="">Link</a>
+                </nav>
             </div>
-            <div id='oDraw' class='card opponent-draw hidden'>
-            </div>
-            <div id='oChallenge' class='card opponent-challenge hidden'>
-            </div>
-            <div id='oB1' class='card opponent-b1 hidden clickable'>
-            </div>
-            <div id='oB2' class='card opponent-b2 hidden clickable'>
-            </div>
-            <div id='oB3' class='card opponent-b3 hidden clickable'>
-            </div>
+        </header>
+        <div class="mdl-layout__drawer">
+            <span class="mdl-layout-title">Title</span>
+            <nav class="mdl-navigation">
+                <a class="mdl-navigation__link" href="">Link</a>
+                <a class="mdl-navigation__link" href="">Link</a>
+                <a class="mdl-navigation__link" href="">Link</a>
+                <a class="mdl-navigation__link" href="">Link</a>
+            </nav>
         </div>
-		<div id='player-div'>
-		    <div id='pDeck' class='card player-deck clickable'>
+        <main class="mdl-layout__content">
+            <div class="page-content">
+                <!-- Your content goes here -->
+                test
+                <div class="mdl-grid">
+                    <div class="mdl-cell mdl-cell--3-col">3</div>
+                    <div class="mdl-cell mdl-cell--3-col">3</div>
+                    <div class="mdl-cell mdl-cell--3-col">3</div>
+                    <div class="mdl-cell mdl-cell--3-col">3</div>
+                </div>
             </div>
-            <div id='pDraw' class='card player-draw hidden'>
-			</div>
-			<div id='pChallenge' class='card player-challenge hidden'>
+            <div id='opponent-div'>
+                <div id='oDeck' class='card opponent-deck'>
+                </div>
+                <div id='oDraw' class='card opponent-draw hidden'>
+                </div>
+                <div id='oChallenge' class='card opponent-challenge hidden'>
+                </div>
+                <div id='oB1' class='card opponent-b1 hidden clickable'>
+                </div>
+                <div id='oB2' class='card opponent-b2 hidden clickable'>
+                </div>
+                <div id='oB3' class='card opponent-b3 hidden clickable'>
+                </div>
             </div>
-			<div id='pB1' class='card player-b1 hidden'>
+            <div id='player-div'>
+                <div id='pDeck' class='card player-deck clickable'>
+                </div>
+                <div id='pDraw' class='card player-draw hidden'>
+                </div>
+                <div id='pChallenge' class='card player-challenge hidden'>
+                </div>
+                <div id='pB1' class='card player-b1 hidden'>
+                </div>
+                <div id='pB2' class='card player-b2 hidden'>
+                </div>
+                <div id='pB3' class='card player-b3 hidden'>
+                </div>
             </div>
-			<div id='pB2' class='card player-b2 hidden'>
+        </main>
+    </div>
+    <footer class="mdl-mini-footer">
+        <div class="mdl-mini-footer__left-section">
+            <div class="mdl-logo">
+                More Information
             </div>
-			<div id='pB3' class='card player-b3 hidden'>
-            </div>
-		</div>
-        <div id='footer'>
-	        <div id='playerframe'>
-				<h2>Player</h2>
-		        <div id='player-progressbar'>
-			      <div>26/26</div>
-			    </div>
-		    </div>
-	    </div>
-    </body>
+            test
+            <ul class="mdl-mini-footer__link-list">
+                <li><a href="#">Help</a></li>
+                <li><a href="#">Privacy and Terms</a></li>
+                <li><a href="#">User Agreement</a></li>
+            </ul>
+        </div>
+        <div class="mdl-mini-footer__right-section">
+            <button class="mdl-mini-footer__social-btn"></button>
+        </div>
+    </footer>
+
+</body>
+
 </html>
