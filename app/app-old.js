@@ -72,60 +72,7 @@ var Engine = (function(self, $) {
     /**
      * The set of unused cards that have yet to be dealt.
      */
-    self.deck = [{
-        1: 'spades 1',
-        2: 'spades 2',
-        3: 'spades 3',
-        4: 'spades 4',
-        5: 'spades 5',
-        6: 'spades 6',
-        7: 'spades 7',
-        8: 'spades 8',
-        9: 'spades 9',
-        10: 'spades 10',
-        11: 'spades 11',
-        12: 'spades 12',
-        13: 'spades 13',
-        14: 'clubs 1',
-        15: 'clubs 2',
-        16: 'clubs 3',
-        17: 'clubs 4',
-        18: 'clubs 5',
-        19: 'clubs 6',
-        20: 'clubs 7',
-        21: 'clubs 8',
-        22: 'clubs 9',
-        23: 'clubs 10',
-        24: 'clubs 11',
-        25: 'clubs 12',
-        26: 'clubs 13',
-        27: 'diams 1',
-        28: 'diams 2',
-        29: 'diams 3',
-        30: 'diams 4',
-        31: 'diams 5',
-        32: 'diams 6',
-        33: 'diams 7',
-        34: 'diams 8',
-        35: 'diams 9',
-        36: 'diams 10',
-        37: 'diams 11',
-        38: 'diams 12',
-        39: 'diams 13',
-        40: 'hearts 1',
-        41: 'hearts 2',
-        42: 'hearts 3',
-        43: 'hearts 4',
-        44: 'hearts 5',
-        45: 'hearts 6',
-        46: 'hearts 7',
-        47: 'hearts 8',
-        48: 'hearts 9',
-        49: 'hearts 10',
-        50: 'hearts 11',
-        51: 'hearts 12',
-        52: 'hearts 13'
-    }];
+    self.deck = [];
 
     /**
      * The set of used cards removed from play.
@@ -137,23 +84,23 @@ var Engine = (function(self, $) {
      */
     self.player = {};
     self.opponent = {};
-    self.oCardsLeft = $('#opponent-progressbar div');
-    self.pCardsLeft = $('#player-progressbar div');
-    self.oDeck = $('#oDeck');
-    self.pDeck = $('#pDeck');
-    self.oDraw = $('#oDraw');
-    self.pDraw = $('#pDraw');
-    self.oChallenge = $('#oChallenge');
-    self.pChallenge = $('#pChallenge');
-    self.oB1 = $('#oB1');
-    self.pB1 = $('#pB1');
-    self.oB2 = $('#oB2');
-    self.pB2 = $('#pB2');
-    self.oB3 = $('#oB3');
-    self.pB3 = $('#pB3');
-    self.flavortext = $('#flavortext');
-    self.pwins = $('#player-wins');
-    self.owins = $('#opponent-wins');
+    self.oCardsLeft = {};
+    self.pCardsLeft = {};
+    self.oDeck = {};
+    self.pDeck = {};
+    self.oDraw = {};
+    self.pDraw = {};
+    self.oChallenge = {};
+    self.pChallenge = {};
+    self.oB1 = {};
+    self.pB1 = {};
+    self.oB2 = {};
+    self.pB2 = {};
+    self.oB3 = {};
+    self.pB3 = {};
+    self.flavortext = {};
+    self.pwins = {};
+    self.owins = {};
     self.turnCount = 0;
     self.oBattleCards = [];
     self.pBattleCards = [];
@@ -202,8 +149,89 @@ var Engine = (function(self, $) {
             };
             self.log('[Engine.Init] Debugging enabled.');
         }
+
+        self.oCardsLeft = $('#opponent-progressbar div');
+        self.pCardsLeft = $('#player-progressbar div');
+        self.oDeck = $('#oDeck');
+        self.pDeck = $('#pDeck');
+        self.oDraw = $('#oDraw');
+        self.pDraw = $('#pDraw');
+        self.oChallenge = $('#oChallenge');
+        self.pChallenge = $('#pChallenge');
+        self.oB1 = $('#oB1');
+        self.pB1 = $('#pB1');
+        self.oB2 = $('#oB2');
+        self.pB2 = $('#pB2');
+        self.oB3 = $('#oB3');
+        self.pB3 = $('#pB3');
+        self.flavortext = $('#flavortext');
+        self.pwins = $('#player-wins');
+        self.owins = $('#opponent-wins');
+
+        self.initDeck();
+        self.player = self.initPlayer(new Player());
+        self.opponent = self.initOpponent(new Player());
+
         self.play();
+
         self.log('[Engine.Init] Done.');
+    };
+
+    self.initDeck = function() {
+        self.deck = [{
+            1: 'spades 1',
+            2: 'spades 2',
+            3: 'spades 3',
+            4: 'spades 4',
+            5: 'spades 5',
+            6: 'spades 6',
+            7: 'spades 7',
+            8: 'spades 8',
+            9: 'spades 9',
+            10: 'spades 10',
+            11: 'spades 11',
+            12: 'spades 12',
+            13: 'spades 13',
+            14: 'clubs 1',
+            15: 'clubs 2',
+            16: 'clubs 3',
+            17: 'clubs 4',
+            18: 'clubs 5',
+            19: 'clubs 6',
+            20: 'clubs 7',
+            21: 'clubs 8',
+            22: 'clubs 9',
+            23: 'clubs 10',
+            24: 'clubs 11',
+            25: 'clubs 12',
+            26: 'clubs 13',
+            27: 'diams 1',
+            28: 'diams 2',
+            29: 'diams 3',
+            30: 'diams 4',
+            31: 'diams 5',
+            32: 'diams 6',
+            33: 'diams 7',
+            34: 'diams 8',
+            35: 'diams 9',
+            36: 'diams 10',
+            37: 'diams 11',
+            38: 'diams 12',
+            39: 'diams 13',
+            40: 'hearts 1',
+            41: 'hearts 2',
+            42: 'hearts 3',
+            43: 'hearts 4',
+            44: 'hearts 5',
+            45: 'hearts 6',
+            46: 'hearts 7',
+            47: 'hearts 8',
+            48: 'hearts 9',
+            49: 'hearts 10',
+            50: 'hearts 11',
+            51: 'hearts 12',
+            52: 'hearts 13'
+        }];
     };
 
     /**
@@ -235,9 +263,6 @@ var Engine = (function(self, $) {
      */
     self.play = function() {
         self.log('[Engine.play] Starting Smack.');
-
-        self.player = self.initPlayer(new Player());
-        self.opponent = self.initOpponent(new Player());
         self.pwins.text(self.player.wins);
         self.owins.text(self.opponent.wins);
 
@@ -276,34 +301,35 @@ var Engine = (function(self, $) {
             self.compareCards(self.player.currentCard, self.opponent.currentCard);
         });
 
+        // TODO: refactor the following 3 methods into a single 'battle card selected' method
         self.oB1.click(function() {
-            const opponentCard = self.oBattleCards[0];
-            const playerCard = self.pBattleCards[Math.floor(Math.random() * self.pBattleCards.length)];
+            self.opponent.currentCard = self.oBattleCards[0];
+            self.player.currentCard = self.pBattleCards[Math.floor(Math.random() * self.pBattleCards.length)];
             self.oB1.removeClass('glow').removeClass('clickable');
             self.oB2.removeClass('glow').removeClass('clickable');
             self.oB3.removeClass('glow').removeClass('clickable');
-            self.setCard('#oB1', opponentCard.split(' ')[0], opponentCard.split(' ')[1]);
-            self.compareCards(playerCard, opponentCard);
+            self.setCard('#oB1', self.opponent.currentCard.split(' ')[0], self.opponent.currentCard.split(' ')[1]);
+            self.compareCards(self.player.currentCard, self.opponent.currentCard);
         });
 
         self.oB2.click(function() {
-            const opponentCard = self.oBattleCards[1];
-            const playerCard = self.pBattleCards[Math.floor(Math.random() * self.pBattleCards.length)];
+            self.opponent.currentCard = self.oBattleCards[1];
+            self.player.currentCard = self.pBattleCards[Math.floor(Math.random() * self.pBattleCards.length)];
             self.oB1.removeClass('glow').removeClass('clickable');
             self.oB2.removeClass('glow').removeClass('clickable');
             self.oB3.removeClass('glow').removeClass('clickable');
-            self.setCard('#oB2', opponentCard.split(' ')[0], opponentCard.split(' ')[1]);
-            self.compareCards(playerCard, opponentCard);
+            self.setCard('#oB2', self.opponent.currentCard.split(' ')[0], self.opponent.currentCard.split(' ')[1]);
+            self.compareCards(self.player.currentCard, self.opponent.currentCard);
         });
 
         self.oB3.click(function() {
-            const opponentCard = self.oBattleCards[2];
-            const playerCard = self.pBattleCards[Math.floor(Math.random() * self.pBattleCards.length)];
+            self.opponent.currentCard = self.oBattleCards[2];
+            self.player.currentCard = self.pBattleCards[Math.floor(Math.random() * self.pBattleCards.length)];
             self.oB1.removeClass('glow').removeClass('clickable');
             self.oB2.removeClass('glow').removeClass('clickable');
             self.oB3.removeClass('glow').removeClass('clickable');
-            self.setCard('#oB3', opponentCard.split(' ')[0], opponentCard.split(' ')[1]);
-            self.compareCards(playerCard, opponentCard);
+            self.setCard('#oB3', self.opponent.currentCard.split(' ')[0], self.opponent.currentCard.split(' ')[1]);
+            self.compareCards(self.player.currentCard, self.opponent.currentCard);
         });
     };
 
@@ -314,66 +340,74 @@ var Engine = (function(self, $) {
     self.initPlayer = function(player) {
         player.init({ debug: false, color: 'red' });
         self.log('[Engine.initPlayer] Setting up red player.');
-        player.hand[0] = 'diams 1';
-        player.hand[1] = 'diams 2';
-        player.hand[2] = 'diams 3';
-        player.hand[3] = 'diams 4';
-        player.hand[4] = 'diams 5';
-        player.hand[5] = 'diams 6';
-        player.hand[6] = 'diams 7';
-        player.hand[7] = 'diams 8';
-        player.hand[8] = 'diams 9';
-        player.hand[9] = 'diams 10';
-        player.hand[10] = 'diams 11';
-        player.hand[11] = 'diams 12';
-        player.hand[12] = 'diams 13';
-        player.hand[13] = 'hearts 1';
-        player.hand[14] = 'hearts 2';
-        player.hand[15] = 'hearts 3';
-        player.hand[16] = 'hearts 4';
-        player.hand[17] = 'hearts 5';
-        player.hand[18] = 'hearts 6';
-        player.hand[19] = 'hearts 7';
-        player.hand[20] = 'hearts 8';
-        player.hand[21] = 'hearts 9';
-        player.hand[22] = 'hearts 10';
-        player.hand[23] = 'hearts 11';
-        player.hand[24] = 'hearts 12';
-        player.hand[25] = 'hearts 13';
+        const half = Math.ceil(self.deck / 2);
+        player.hand = player.hand.concat(self.deck.slice(half, half))
+            // player.hand[0] = 'diams 1';
+            // player.hand[1] = 'diams 2';
+            // player.hand[2] = 'diams 3';
+            // player.hand[3] = 'diams 4';
+            // player.hand[4] = 'diams 5';
+            // player.hand[5] = 'diams 6';
+            // player.hand[6] = 'diams 7';
+            // player.hand[7] = 'diams 8';
+            // player.hand[8] = 'diams 9';
+            // player.hand[9] = 'diams 10';
+            // player.hand[10] = 'diams 11';
+            // player.hand[11] = 'diams 12';
+            // player.hand[12] = 'diams 13';
+            // player.hand[13] = 'hearts 1';
+            // player.hand[14] = 'hearts 2';
+            // player.hand[15] = 'hearts 3';
+            // player.hand[16] = 'hearts 4';
+            // player.hand[17] = 'hearts 5';
+            // player.hand[18] = 'hearts 6';
+            // player.hand[19] = 'hearts 7';
+            // player.hand[20] = 'hearts 8';
+            // player.hand[21] = 'hearts 9';
+            // player.hand[22] = 'hearts 10';
+            // player.hand[23] = 'hearts 11';
+            // player.hand[24] = 'hearts 12';
+            // player.hand[25] = 'hearts 13';
+        self.log(player.hand);
         player.hand = self.shuffle(player.hand);
+        self.log(player.hand);
         return player;
     };
 
     self.initOpponent = function(player) {
         player.init({ debug: false, color: 'black' });
         self.log('[Engine.initOpponent] Setting up black player.');
-        player.hand[0] = 'spades 1';
-        player.hand[1] = 'spades 2';
-        player.hand[2] = 'spades 3';
-        player.hand[3] = 'spades 4';
-        player.hand[4] = 'spades 5';
-        player.hand[5] = 'spades 6';
-        player.hand[6] = 'spades 7';
-        player.hand[7] = 'spades 8';
-        player.hand[8] = 'spades 9';
-        player.hand[9] = 'spades 10';
-        player.hand[10] = 'spades 11';
-        player.hand[11] = 'spades 12';
-        player.hand[12] = 'spades 13';
-        player.hand[13] = 'clubs 1';
-        player.hand[14] = 'clubs 2';
-        player.hand[15] = 'clubs 3';
-        player.hand[16] = 'clubs 4';
-        player.hand[17] = 'clubs 5';
-        player.hand[18] = 'clubs 6';
-        player.hand[19] = 'clubs 7';
-        player.hand[20] = 'clubs 8';
-        player.hand[21] = 'clubs 9';
-        player.hand[22] = 'clubs 10';
-        player.hand[23] = 'clubs 11';
-        player.hand[24] = 'clubs 12';
-        player.hand[25] = 'clubs 13';
+        // because it's called after player setup
+        player.hand = player.hand.concat(self.deck.slice(0, self.deck.length));
+        // player.hand[0] = 'spades 1';
+        // player.hand[1] = 'spades 2';
+        // player.hand[2] = 'spades 3';
+        // player.hand[3] = 'spades 4';
+        // player.hand[4] = 'spades 5';
+        // player.hand[5] = 'spades 6';
+        // player.hand[6] = 'spades 7';
+        // player.hand[7] = 'spades 8';
+        // player.hand[8] = 'spades 9';
+        // player.hand[9] = 'spades 10';
+        // player.hand[10] = 'spades 11';
+        // player.hand[11] = 'spades 12';
+        // player.hand[12] = 'spades 13';
+        // player.hand[13] = 'clubs 1';
+        // player.hand[14] = 'clubs 2';
+        // player.hand[15] = 'clubs 3';
+        // player.hand[16] = 'clubs 4';
+        // player.hand[17] = 'clubs 5';
+        // player.hand[18] = 'clubs 6';
+        // player.hand[19] = 'clubs 7';
+        // player.hand[20] = 'clubs 8';
+        // player.hand[21] = 'clubs 9';
+        // player.hand[22] = 'clubs 10';
+        // player.hand[23] = 'clubs 11';
+        // player.hand[24] = 'clubs 12';
+        // player.hand[25] = 'clubs 13';
+        self.log(player.hand);
         player.hand = self.shuffle(player.hand);
+        self.log(player.hand);
         return player;
     };
 
@@ -393,24 +427,28 @@ var Engine = (function(self, $) {
         if (cardAValue === cardBValue) {
             // draw the next 3 and put them in the B slots for each player
             self.initBattle();
-            // If player 1 pulled an ace
-        } else if (cardAValue === '1') {
+
+        }
+        // If player 1 pulled an ace
+        else if (cardAValue === '1') {
             // if opponent's card is anything other than 2, win
             if (cardBValue === '2') {
                 // no challenge--Player loses
                 self.loseHand(cardA, cardB);
             }
             self.winHand(cardA, cardB);
-            // If player 2 pulled an ace
-        } else if (cardBValue === '1') {
+        }
+        // If player 2 pulled an ace
+        else if (cardBValue === '1') {
             // if opponent's card is anything other than 2, win
             if (cardAValue === '2') {
                 // no challenge--Opponent loses
                 self.winHand(cardA, cardB);
             }
             self.loseHand(cardA, cardB);
-        } else if (cardAValue > cardBValue) {
-            // Player 1 wins, Opponent can challenge 
+        }
+        // Player 1 wins, Opponent can challenge 
+        else if (cardAValue > cardBValue) {
             // Determine probabilities that Opponent might challenge
             let challengeProbability = Math.floor(Math.random() * (20 - 1) + 1);
             if (cardBValue + challengeProbability > 10) {
@@ -421,8 +459,9 @@ var Engine = (function(self, $) {
                 // If no challenge
                 self.winHand(cardA, cardB);
             }
-        } else {
-            // Player 2 wins, Player 1 can challenge
+        }
+        // Player 2 wins, Player 1 can challenge
+        else {
             self.flavortext.text("You've an opportunity to challenge, click your deck to ignore.");
             self.pDraw.addClass('glow').addClass('clickable');
             self.pDeck.addClass('glow').addClass('clickable');
@@ -431,7 +470,7 @@ var Engine = (function(self, $) {
 
     self.winHand = function(pCard, oCard) {
         self.flavortext.text(self.winMessages[Math.floor(Math.random() * self.winMessages.length)]);
-        self.shake(2, self.opponent.oCardsLeft);
+        self.shake(2, self.oCardsLeft);
         self.oDraw.fadeOut('slow');
         self.pDraw.fadeOut('slow');
         self.oCardsLeft.attr('width', ((self.opponent.hand.length - 1) * 100).toString() + '%');
@@ -445,7 +484,7 @@ var Engine = (function(self, $) {
 
     self.loseHand = function(pCard, oCard) {
         self.flavortext.text(self.loseMessages[Math.floor(Math.random() * self.loseMessages.length)]);
-        self.shake(2, self.player.oCardsLeft);
+        self.shake(2, self.oCardsLeft);
         self.oDraw.fadeOut('slow');
         self.pDraw.fadeOut('slow');
         self.pCardsLeft.attr('width', ((self.player.hand.length - 1) * 100).toString() + '%');
@@ -459,11 +498,13 @@ var Engine = (function(self, $) {
 
     self.winGame = function() {
         self.gameEnd = true;
+        self.player.wins += 1;
         self.flavortext.text("You win!");
     };
 
     self.loseGame = function() {
         self.gameEnd = true;
+        self.opponent.wins += 1;
         self.flavortext.text("You lose!");
     };
 
