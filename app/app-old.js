@@ -4,6 +4,8 @@
  * 8/15/2012
  * The concept of 'smack' was conceived years ago
  * by myself with the help of Joshua Lindsay widerightturns13@yahoo.com
+ * Special thanks to Lacy Boler for debugging and rubber ducking
+ * lacy.victoria@gmail.com
  */
 
 /**
