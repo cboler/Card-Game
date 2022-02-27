@@ -5,6 +5,7 @@
  * The concept of 'smack' was conceived years ago
  * by myself with the help of Joshua Lindsay widerightturns13@yahoo.com
  */
+
 /**
  * Player: Class containing information about the player
  */
@@ -13,32 +14,21 @@ function Player() {
      * Default option configuration
      */
     this.opts = {
-        debug: false,
-        color: 'black',
-        number: 1
+        debug: false
     };
-    /**
-     *
-     */
-    this.number = 1;
-    /**
-     *
-     */
-    this.color = 'black';
-    /**
-     * Set of cards in the player's hand
-     */
+    this.wins = 0;
     this.hand = [];
+    this.cardsOnTable = [];
+    this.currentCard = {};
+
     /**
      * Initialization function that sets options
-     * @param {Object} options: { debug, color }
+     * @param {Object} options: { debug }
      */
     this.init = function(options) {
         var self = this;
         // Apply options
         $.extend(true, self.opts, options);
-        self.number = self.opts.number;
-        self.color = self.opts.color;
         // Enable debug logging
         if (self.opts.debug) {
             self.log = function(str) {
@@ -62,7 +52,7 @@ function Player() {
 };
 
 /**
- * Engine: generic engine for card games.
+ * Engine: engine for smack.
  * This engine expects you to lay out the game in HTML prior to initialization.
  * @param {Object} self: Engine
  * @param {Object} $: jQuery
@@ -76,6 +66,7 @@ var Engine = (function(self, $) {
         game: undefined,
         playerCount: 2
     };
+
     /**
      * The set of unused cards that have yet to be dealt.
      */
@@ -133,14 +124,61 @@ var Engine = (function(self, $) {
         51: 'hearts 12',
         52: 'hearts 13'
     }];
+
     /**
      * The set of used cards removed from play.
      */
     self.discard = [];
+
     /**
-     * The set of players, used to keep up with hands.
+     * Game state variables
      */
-    self.players = [];
+    self.player = {};
+    self.opponent = {};
+    self.oCardsLeft = $('#opponent-progressbar div');
+    self.pCardsLeft = $('#player-progressbar div');
+    self.oDeck = $('#oDeck');
+    self.pDeck = $('#pDeck');
+    self.oDraw = $('#oDraw');
+    self.pDraw = $('#pDraw');
+    self.oChallenge = $('#oChallenge');
+    self.pChallenge = $('#pChallenge');
+    self.oB1 = $('#oB1');
+    self.pB1 = $('#pB1');
+    self.oB2 = $('#oB2');
+    self.pB2 = $('#pB2');
+    self.oB3 = $('#oB3');
+    self.pB3 = $('#pB3');
+    self.flavortext = $('#flavortext');
+    self.pwins = $('#player-wins');
+    self.owins = $('#opponent-wins');
+    self.turnCount = 0;
+    self.oBattleCards = [];
+    self.pBattleCards = [];
+    self.gameEnd = false;
+    self.winMessages = [
+        "It appears you've won.",
+        "Good show."
+    ];
+    self.loseMessages = [
+        "Ouch.",
+        "That looked painful."
+    ];
+
+    self.shake = function(n, element) {
+        let me = element;
+        if (me.moveBy) {
+            for (i = 10; i > 0; i--) {
+                for (j = n; j > 0; j--) {
+                    me.moveBy(0, i);
+                    me.moveBy(i, 0);
+                    me.moveBy(0, -i);
+                    me.moveBy(-i, 0);
+                }
+            }
+        }
+    };
+
     /**
      * Initialization function that sets options
      * @param {Object} options: { debug }
@@ -165,6 +203,7 @@ var Engine = (function(self, $) {
         self.play();
         self.log('[Engine.Init] Done.');
     };
+
     /**
      * Array shuffling function from
      * http://bost.ocks.org/mike/shuffle/
@@ -175,220 +214,299 @@ var Engine = (function(self, $) {
      * @param {array} array: the array to shuffle
      */
     self.shuffle = function shuffle(array) {
-            var m = array.length,
-                t, i;
-            // While there remain elements to shuffle…
-            while (m) {
-                // Pick a remaining element…
-                i = Math.floor(Math.random() * m--);
-                // And swap it with the current element.
-                t = array[m];
-                array[m] = array[i];
-                array[i] = t;
-            }
-            return array;
-            self.log('[Engine.shuffle] shuffle completed.');
+        var m = array.length,
+            t, i;
+        // While there remain elements to shuffle…
+        while (m) {
+            // Pick a remaining element…
+            i = Math.floor(Math.random() * m--);
+            // And swap it with the current element.
+            t = array[m];
+            array[m] = array[i];
+            array[i] = t;
         }
-        /**
-         * Begins the game
-         */
+        return array;
+    };
+
+    /**
+     * Begins the game
+     */
     self.play = function() {
-        // Set up game options/rules. This is where you would extend for more games.
-        switch (opts.game) {
-            case 'smack':
-                if (opts.playerCount !== 2) {
-                    alert('[Engine.play] Invalid player count.');
-                }
-                self.log('[Engine.play] Starting Smack.');
-                // Define variables
-                var oCardsLeft = $('#opponent-progressbar div'),
-                    pCardsLeft = $('#player-progressbar div'),
-                    oDeck = $('#oDeck'),
-                    pDeck = $('#pDeck'),
-                    oDraw = $('#oDraw'),
-                    pDraw = $('#pDraw'),
-                    oChallenge = $('#oChallenge'),
-                    pChallenge = $('#pChallenge'),
-                    oB1 = $('#oB1'),
-                    pB1 = $('#pB1'),
-                    oB2 = $('#oB2'),
-                    pB2 = $('#pB2'),
-                    oB3 = $('#oB3'),
-                    pB3 = $('#pB3'),
-                    pIndex = 0,
-                    oIndex = 0,
-                    inBattle = false,
-                    inChallenge = false;
-                self.players[1] = new Player();
-                self.players[1].init({ debug: true, number: 1, color: 'red' });
-                self.log('[Engine.play] Setting up red player.');
-                self.players[1].hand[0] = 'diams 1';
-                self.players[1].hand[1] = 'diams 2';
-                self.players[1].hand[2] = 'diams 3';
-                self.players[1].hand[3] = 'diams 4';
-                self.players[1].hand[4] = 'diams 5';
-                self.players[1].hand[5] = 'diams 6';
-                self.players[1].hand[6] = 'diams 7';
-                self.players[1].hand[7] = 'diams 8';
-                self.players[1].hand[8] = 'diams 9';
-                self.players[1].hand[9] = 'diams 10';
-                self.players[1].hand[10] = 'diams 11';
-                self.players[1].hand[11] = 'diams 12';
-                self.players[1].hand[12] = 'diams 13';
-                self.players[1].hand[13] = 'hearts 1';
-                self.players[1].hand[14] = 'hearts 2';
-                self.players[1].hand[15] = 'hearts 3';
-                self.players[1].hand[16] = 'hearts 4';
-                self.players[1].hand[17] = 'hearts 5';
-                self.players[1].hand[18] = 'hearts 6';
-                self.players[1].hand[19] = 'hearts 7';
-                self.players[1].hand[20] = 'hearts 8';
-                self.players[1].hand[21] = 'hearts 9';
-                self.players[1].hand[22] = 'hearts 10';
-                self.players[1].hand[23] = 'hearts 11';
-                self.players[1].hand[24] = 'hearts 12';
-                self.players[1].hand[25] = 'hearts 13';
-                self.players[1].hand = self.shuffle(self.players[1].hand);
-                self.players[2] = new Player();
-                self.players[2].init({ debug: true, number: 2, color: 'black' });
-                self.log('[Engine.play] Setting up black player.');
-                self.players[2].hand[0] = 'spades 1';
-                self.players[2].hand[1] = 'spades 2';
-                self.players[2].hand[2] = 'spades 3';
-                self.players[2].hand[3] = 'spades 4';
-                self.players[2].hand[4] = 'spades 5';
-                self.players[2].hand[5] = 'spades 6';
-                self.players[2].hand[6] = 'spades 7';
-                self.players[2].hand[7] = 'spades 8';
-                self.players[2].hand[8] = 'spades 9';
-                self.players[2].hand[9] = 'spades 10';
-                self.players[2].hand[10] = 'spades 11';
-                self.players[2].hand[11] = 'spades 12';
-                self.players[2].hand[12] = 'spades 13';
-                self.players[2].hand[13] = 'clubs 1';
-                self.players[2].hand[14] = 'clubs 2';
-                self.players[2].hand[15] = 'clubs 3';
-                self.players[2].hand[16] = 'clubs 4';
-                self.players[2].hand[17] = 'clubs 5';
-                self.players[2].hand[18] = 'clubs 6';
-                self.players[2].hand[19] = 'clubs 7';
-                self.players[2].hand[20] = 'clubs 8';
-                self.players[2].hand[21] = 'clubs 9';
-                self.players[2].hand[22] = 'clubs 10';
-                self.players[2].hand[23] = 'clubs 11';
-                self.players[2].hand[24] = 'clubs 12';
-                self.players[2].hand[25] = 'clubs 13';
-                self.players[2].hand = self.shuffle(self.players[2].hand);
-                var p1CardsLeft = self.players[1].hand.length,
-                    p2CardsLeft = self.players[2].hand.length,
-                    p1Hand = self.players[1].hand,
-                    p2Hand = self.players[2].hand;
-                pDeck.addClass('glow');
+        self.log('[Engine.play] Starting Smack.');
 
-                // Begin turns and check rules for each action
-                pDeck.click(function() {
-                    self.log('[Engine.play] Player deck clicked.');
-                    var p1Card = p1Hand[pIndex],
-                        p2Card = p2Hand[oIndex];
-                    pDraw.slideDown('slow');
-                    self.setCard('#pDraw', p1Card.split(' ')[0], p1Card.split(' ')[1]);
-                    oDraw.slideDown('slow');
-                    self.setCard('#oDraw', p2Card.split(' ')[0], p2Card.split(' ')[1]);
-                    pDeck.removeClass('glow');
-                    // TODO: NEED TO USE PARSEINT, RIGHT NOW IT'S COMPARING TEXT VALUES...
-                    // if card values are the same
-                    if (p1Card.split(' ')[1] === p2Card.split(' ')[1]) {
-                        // draw the next 3 and put them in the B slots for each player
-                        oIndex += 1;
-                        p2Card = p2Hand[oIndex];
-                        oB1.slideDown('slow', function() {
-                            $(this).addClass('glow');
-                        });
-                        self.setCard('#oB1', p2Card.split(' ')[0], p2Card.split(' ')[1]);
-                        oIndex += 1;
-                        p2Card = p2Hand[oIndex];
-                        oB2.slideDown('slow', function() {
-                            $(this).addClass('glow');
-                        });
-                        self.setCard('#oB2', p2Card.split(' ')[0], p2Card.split(' ')[1]);
-                        oIndex += 1;
-                        p2Card = p2Hand[oIndex];
-                        oB3.slideDown('slow', function() {
-                            $(this).addClass('glow');
-                        });
-                        self.setCard('#oB3', p2Card.split(' ')[0], p2Card.split(' ')[1]);
-                        pIndex += 1;
-                        p1Card = p1Hand[pIndex];
-                        pB1.slideDown('slow');
-                        self.setCard('#pB1', p1Card.split(' ')[0], p1Card.split(' ')[1]);
-                        pIndex += 1;
-                        p1Card = p1Hand[pIndex];
-                        pB2.slideDown('slow');
-                        self.setCard('#pB2', p1Card.split(' ')[0], p1Card.split(' ')[1]);
-                        pIndex += 1;
-                        p1Card = p1Hand[pIndex];
-                        pB3.slideDown('slow');
-                        self.setCard('#pB3', p1Card.split(' ')[0], p1Card.split(' ')[1]);
-                        // Then wait for decision click
-                        // If player 1 pulled an ace
-                    } else if (p1Card.split(' ')[1] === '1') {
-                        // if opponent's card is anything other than 2, win
-                        if (p2Card.split(' ')[1] === '2') {
-                            // no challenge--Player 1 loses
-                        }
-                        // If player 2 pulled an ace
-                    } else if (p2Card.split(' ')[1] === '1') {
-                        // if opponent's card is anything other than 2, win
-                        if (p1Card.split(' ')[1] === '2') {
-                            // no challenge--Player 2 loses
-                        }
-                    } else if (p1Card.split(' ')[1] > p2Card.split(' ')[1]) {
-                        // Player 1 wins, Player 2 can challenge 
-                        // Determine probabilities that Player 2 might challenge
+        self.player = self.initPlayer(new Player());
+        self.opponent = self.initOpponent(new Player());
+        self.pwins.text(self.player.wins);
+        self.owins.text(self.opponent.wins);
 
-                        // If no challenge
-                        oDraw.fadeOut('slow');
-                        oCardsLeft.attr('width', ((26 - 1) * 100).toString() + '%');
-                        oCardsLeft.text('25/26');
-                    } else {
-                        // Player 2 wins, Player 1 can challenge
-                        pDraw.addClass('glow').addClass('clickable');
-                        pDeck.addClass('glow');
-                    }
-                });
-                pDraw.click(function() {
-                    // Challenge initiated
-                });
-                oB1.click(function() {
-                    self.log('[Engine.play] oB1 clicked.');
-                    oB1.removeClass('glow');
-                    oB2.removeClass('glow');
-                    oB3.removeClass('glow');
+        //while (!self.gameEnd) {
+        self.flavortext.text("Click your deck to draw.");
+        self.pDeck.addClass('glow');
 
-                });
-                oB2.click(function() {
-                    self.log('[Engine.play] oB2 clicked.');
-                    oB1.removeClass('glow');
-                    oB2.removeClass('glow');
-                    oB3.removeClass('glow');
+        console.log("pDeck");
+        console.log(self.pDeck);
+        //}
 
-                });
-                oB3.click(function() {
-                    self.log('[Engine.play] oB3 clicked.');
-                    oB1.removeClass('glow');
-                    oB2.removeClass('glow');
-                    oB3.removeClass('glow');
+        self.pDeck.click(function() {
+            // bug here-ish; the deck can't be clicked
+            self.log('[Engine.play] Player deck clicked.');
+            self.turnCount += 1;
+            self.player.currentCard = self.player.hand.shift();
+            self.opponent.currentCard = self.opponent.hand.shift();
+            self.player.cardsOnTable.push(self.player.currentCard);
+            self.opponent.cardsOnTable.push(self.opponent.currentCard);
+            self.log(self.player.currentCard);
+            self.log(self.opponent.currentCard);
 
-                });
-                break;
-            case undefined:
-                alert('[Engine.play] No game type defined.');
-                break;
-            default:
-                alert('[Engine.play] Invalid game type.');
-                break;
+            self.pDraw.slideDown('slow');
+            self.setCard('#pDraw', self.player.currentCard.split(' ')[0], self.player.currentCard.split(' ')[1]);
+            self.oDraw.slideDown('slow');
+            self.setCard('#oDraw', self.opponent.currentCard.split(' ')[0], self.opponent.currentCard.split(' ')[1]);
+            self.pDeck.removeClass('glow');
+
+            self.compareCards(self.player.currentCard, self.opponent.currentCard);
+        });
+
+        self.pDraw.click(function() {
+            // Challenge initiated
+            self.player.currentCard = self.player.hand.shift();
+            self.player.cardsOnTable.push(self.player.currentCard);
+            self.compareCards(self.player.currentCard, self.opponent.currentCard);
+        });
+
+        self.oB1.click(function() {
+            const opponentCard = self.oBattleCards[0];
+            const playerCard = self.pBattleCards[Math.floor(Math.random() * self.pBattleCards.length)];
+            self.oB1.removeClass('glow').removeClass('clickable');
+            self.oB2.removeClass('glow').removeClass('clickable');
+            self.oB3.removeClass('glow').removeClass('clickable');
+            self.setCard('#oB1', opponentCard.split(' ')[0], opponentCard.split(' ')[1]);
+            self.compareCards(playerCard, opponentCard);
+        });
+
+        self.oB2.click(function() {
+            const opponentCard = self.oBattleCards[1];
+            const playerCard = self.pBattleCards[Math.floor(Math.random() * self.pBattleCards.length)];
+            self.oB1.removeClass('glow').removeClass('clickable');
+            self.oB2.removeClass('glow').removeClass('clickable');
+            self.oB3.removeClass('glow').removeClass('clickable');
+            self.setCard('#oB2', opponentCard.split(' ')[0], opponentCard.split(' ')[1]);
+            self.compareCards(playerCard, opponentCard);
+        });
+
+        self.oB3.click(function() {
+            const opponentCard = self.oBattleCards[2];
+            const playerCard = self.pBattleCards[Math.floor(Math.random() * self.pBattleCards.length)];
+            self.oB1.removeClass('glow').removeClass('clickable');
+            self.oB2.removeClass('glow').removeClass('clickable');
+            self.oB3.removeClass('glow').removeClass('clickable');
+            self.setCard('#oB3', opponentCard.split(' ')[0], opponentCard.split(' ')[1]);
+            self.compareCards(playerCard, opponentCard);
+        });
+    };
+
+    /**
+     * Initializes and returns a player
+     * @param {*} player 
+     */
+    self.initPlayer = function(player) {
+        player.init({ debug: false, color: 'red' });
+        self.log('[Engine.initPlayer] Setting up red player.');
+        player.hand[0] = 'diams 1';
+        player.hand[1] = 'diams 2';
+        player.hand[2] = 'diams 3';
+        player.hand[3] = 'diams 4';
+        player.hand[4] = 'diams 5';
+        player.hand[5] = 'diams 6';
+        player.hand[6] = 'diams 7';
+        player.hand[7] = 'diams 8';
+        player.hand[8] = 'diams 9';
+        player.hand[9] = 'diams 10';
+        player.hand[10] = 'diams 11';
+        player.hand[11] = 'diams 12';
+        player.hand[12] = 'diams 13';
+        player.hand[13] = 'hearts 1';
+        player.hand[14] = 'hearts 2';
+        player.hand[15] = 'hearts 3';
+        player.hand[16] = 'hearts 4';
+        player.hand[17] = 'hearts 5';
+        player.hand[18] = 'hearts 6';
+        player.hand[19] = 'hearts 7';
+        player.hand[20] = 'hearts 8';
+        player.hand[21] = 'hearts 9';
+        player.hand[22] = 'hearts 10';
+        player.hand[23] = 'hearts 11';
+        player.hand[24] = 'hearts 12';
+        player.hand[25] = 'hearts 13';
+        player.hand = self.shuffle(player.hand);
+        return player;
+    };
+
+    self.initOpponent = function(player) {
+        player.init({ debug: false, color: 'black' });
+        self.log('[Engine.initOpponent] Setting up black player.');
+        player.hand[0] = 'spades 1';
+        player.hand[1] = 'spades 2';
+        player.hand[2] = 'spades 3';
+        player.hand[3] = 'spades 4';
+        player.hand[4] = 'spades 5';
+        player.hand[5] = 'spades 6';
+        player.hand[6] = 'spades 7';
+        player.hand[7] = 'spades 8';
+        player.hand[8] = 'spades 9';
+        player.hand[9] = 'spades 10';
+        player.hand[10] = 'spades 11';
+        player.hand[11] = 'spades 12';
+        player.hand[12] = 'spades 13';
+        player.hand[13] = 'clubs 1';
+        player.hand[14] = 'clubs 2';
+        player.hand[15] = 'clubs 3';
+        player.hand[16] = 'clubs 4';
+        player.hand[17] = 'clubs 5';
+        player.hand[18] = 'clubs 6';
+        player.hand[19] = 'clubs 7';
+        player.hand[20] = 'clubs 8';
+        player.hand[21] = 'clubs 9';
+        player.hand[22] = 'clubs 10';
+        player.hand[23] = 'clubs 11';
+        player.hand[24] = 'clubs 12';
+        player.hand[25] = 'clubs 13';
+        player.hand = self.shuffle(player.hand);
+        return player;
+    };
+
+    /**
+     * Compare two cards and return a result
+     * @param {*} cardA : 
+     * @param {*} cardB 
+     */
+    self.compareCards = function(cardA, cardB) {
+        self.log('[Engine.compareCards]');
+        self.log(cardA);
+        self.log(cardB);
+        let cardAValue = cardA.split(' ')[1];
+        let cardBValue = cardB.split(' ')[1];
+
+        // if card values are the same
+        if (cardAValue === cardBValue) {
+            // draw the next 3 and put them in the B slots for each player
+            self.initBattle();
+            // If player 1 pulled an ace
+        } else if (cardAValue === '1') {
+            // if opponent's card is anything other than 2, win
+            if (cardBValue === '2') {
+                // no challenge--Player loses
+                self.loseHand(cardA, cardB);
+            }
+            self.winHand(cardA, cardB);
+            // If player 2 pulled an ace
+        } else if (cardBValue === '1') {
+            // if opponent's card is anything other than 2, win
+            if (cardAValue === '2') {
+                // no challenge--Opponent loses
+                self.winHand(cardA, cardB);
+            }
+            self.loseHand(cardA, cardB);
+        } else if (cardAValue > cardBValue) {
+            // Player 1 wins, Opponent can challenge 
+            // Determine probabilities that Opponent might challenge
+            let challengeProbability = Math.floor(Math.random() * (20 - 1) + 1);
+            if (cardBValue + challengeProbability > 10) {
+                self.flavortext.text("The opponent decided to challenge.");
+                const oChallengeCard = self.opponent.hand.shift();
+                self.compareCards(cardA, oChallengeCard);
+            } else {
+                // If no challenge
+                self.winHand(cardA, cardB);
+            }
+        } else {
+            // Player 2 wins, Player 1 can challenge
+            self.flavortext.text("You've an opportunity to challenge, click your deck to ignore.");
+            self.pDraw.addClass('glow').addClass('clickable');
+            self.pDeck.addClass('glow').addClass('clickable');
         }
     };
+
+    self.winHand = function(pCard, oCard) {
+        self.flavortext.text(self.winMessages[Math.floor(Math.random() * self.winMessages.length)]);
+        self.shake(2, self.opponent.oCardsLeft);
+        self.oDraw.fadeOut('slow');
+        self.pDraw.fadeOut('slow');
+        self.oCardsLeft.attr('width', ((self.opponent.hand.length - 1) * 100).toString() + '%');
+        self.oCardsLeft.text(self.opponent.hand.length + '/26');
+        self.player.hand = self.player.hand.concat(self.player.cardsOnTable);
+        self.discard = self.discard.concat(self.opponent.cardsOnTable);
+        if (self.opponent.hand.length < 1) {
+            self.winGame();
+        }
+    };
+
+    self.loseHand = function(pCard, oCard) {
+        self.flavortext.text(self.loseMessages[Math.floor(Math.random() * self.loseMessages.length)]);
+        self.shake(2, self.player.oCardsLeft);
+        self.oDraw.fadeOut('slow');
+        self.pDraw.fadeOut('slow');
+        self.pCardsLeft.attr('width', ((self.player.hand.length - 1) * 100).toString() + '%');
+        self.pCardsLeft.text(self.player.hand.length + '/26');
+        self.opponent.hand = self.opponent.hand.concat(self.opponent.cardsOnTable);
+        self.discard = self.discard.concat(self.player.cardsOnTable);
+        if (self.player.hand.length < 1) {
+            self.loseGame();
+        }
+    };
+
+    self.winGame = function() {
+        self.gameEnd = true;
+        self.flavortext.text("You win!");
+    };
+
+    self.loseGame = function() {
+        self.gameEnd = true;
+        self.flavortext.text("You lose!");
+    };
+
+    self.initBattle = function() {
+        self.oBattleCards = [];
+        self.oBattleCards.push(self.opponent.hand.shift());
+        self.oBattleCards.push(self.opponent.hand.shift());
+        self.oBattleCards.push(self.opponent.hand.shift());
+        self.opponent.cardsOnTable = self.opponent.cardsOnTable.concat(self.oBattleCards);
+
+        self.pBattleCards = [];
+        self.pBattleCards.push(self.player.hand.shift());
+        self.pBattleCards.push(self.player.hand.shift());
+        self.pBattleCards.push(self.player.hand.shift());
+        self.player.cardsOnTable = self.player.cardsOnTable.concat(self.pBattleCards);
+
+        self.oB1.slideDown('slow', function() {
+            $(this).addClass('glow').addClass('clickable');
+        });
+        self.clearCard('#oB1');
+
+        self.oB2.slideDown('slow', function() {
+            $(this).addClass('glow').addClass('clickable');
+        });
+        self.clearCard('#oB2');
+
+        self.oB3.slideDown('slow', function() {
+            $(this).addClass('glow').addClass('clickable');
+        });
+        self.clearCard('#oB3');
+
+        self.pB1.slideDown('slow');
+        self.setCard('#pB1', self.pBattleCards[0].split(' ')[0], self.pBattleCards[0].split(' ')[1]);
+
+        self.pB2.slideDown('slow');
+        self.setCard('#pB2', self.pBattleCards[1].split(' ')[0], self.pBattleCards[1].split(' ')[1]);
+
+        self.pB3.slideDown('slow');
+        self.setCard('#pB3', self.pBattleCards[2].split(' ')[0], self.pBattleCards[2].split(' ')[1]);
+
+        // Then wait for decision click done by picking a face-down opponent card
+        self.flavortext.text("Select one of your opponent's cards.");
+    };
+
+
     /**
      * Visually sets a card to a specific value in the face-up state.
      * @param {Object} card: CSS selector for the card element. (#cardId)
@@ -396,9 +514,8 @@ var Engine = (function(self, $) {
      * @param {Object} value: 1-13 or 'ace' - 'king' or 'one' - 'thirteen'
      */
     self.setCard = function(card, suite, value) {
-        self.log('[Engine.setCard] suite:' + suite + ' value: ' + value);
+        self.log('[Engine.setCard] suite: ' + suite + ' value: ' + value);
         if ($(card).length > 0 && (suite == 'spades' || suite == 'clubs' || suite == 'diams' || suite == 'hearts')) {
-            self.log('[Engine.setCard] card exists and valid suite.');
             $(card).empty();
             switch (value) {
                 case 'ten':
@@ -611,19 +728,23 @@ var Engine = (function(self, $) {
             }
         }
     };
+
     /**
      * Visually clears a card, returning it to the face-down state.
      * @param {Object} card: CSS selector for the card element. (#cardId)
      */
     self.clearCard = function(card) {
         if ($(card).length > 0) {
-            self.log('[Engine.clearCard] card exists.');
+            self.log('[Engine.clearCard] card cleared.');
             $(card).empty();
         }
     };
+
     /**
      * Overridden to perform console logging if options.debug is set to true.
      */
     self.log = function() {};
+
     return self;
+
 }(Engine || {}, jQuery));
