@@ -69,9 +69,7 @@ var Engine = (function(self, $) {
      * Default option configuration
      */
     var opts = {
-        debug: false,
-        game: undefined,
-        playerCount: 2
+        debug: false
     };
 
     self.setCookie = function(c_name, value, exdays) {
