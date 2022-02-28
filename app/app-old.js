@@ -44,7 +44,7 @@ function Player() {
             };
             self.log('[Player:' + self.number + '.Init] Debugging enabled.');
         }
-        self.wins = 0;
+        self.wins = options.wins || 0;
         self.hand = [];
         self.cardsOnTable = [];
         self.currentCard = '';
@@ -237,10 +237,17 @@ var Engine = (function(self, $) {
                 self.log('opponent card');
                 self.log(self.opponent.currentCard);
 
+                self.oCardsInPlay.text(self.opponent.cardsOnTable.length);
+                self.pCardsInPlay.text(self.player.cardsOnTable.length);
+
                 self.pDraw.slideDown('slow');
-                self.setCard('#pDraw', self.player.currentCard.split(' ')[0], self.player.currentCard.split(' ')[1]);
+                self.setCard('#pDraw',
+                    self.player.currentCard.split(' ')[0],
+                    self.player.currentCard.split(' ')[1]);
                 self.oDraw.slideDown('slow');
-                self.setCard('#oDraw', self.opponent.currentCard.split(' ')[0], self.opponent.currentCard.split(' ')[1]);
+                self.setCard('#oDraw',
+                    self.opponent.currentCard.split(' ')[0],
+                    self.opponent.currentCard.split(' ')[1]);
                 self.pDeck.removeClass('glow');
 
                 self.compareCards();
@@ -253,9 +260,13 @@ var Engine = (function(self, $) {
             self.flavortext.text(self.challengeMessages[Math.floor(Math.random() * self.challengeMessages.length)]);
             self.pDraw.removeClass('glow').removeClass('clickable');
             self.pDeck.removeClass('glow').removeClass('clickable');
+
             // Challenge initiated
             self.player.currentCard = self.player.hand.shift();
             self.player.cardsOnTable.push(self.player.currentCard);
+
+            self.oCardsInPlay.text(self.opponent.cardsOnTable.length);
+            self.pCardsInPlay.text(self.player.cardsOnTable.length);
 
             // show card
             self.pChallenge.slideDown('slow');
@@ -275,7 +286,9 @@ var Engine = (function(self, $) {
             self.oB1.removeClass('glow').removeClass('clickable');
             self.oB2.removeClass('glow').removeClass('clickable');
             self.oB3.removeClass('glow').removeClass('clickable');
-            self.setCard('#oB1', self.opponent.currentCard.split(' ')[0], self.opponent.currentCard.split(' ')[1]);
+            self.setCard('#oB1',
+                self.opponent.currentCard.split(' ')[0],
+                self.opponent.currentCard.split(' ')[1]);
             self.compareCards();
         });
 
@@ -285,7 +298,9 @@ var Engine = (function(self, $) {
             self.oB1.removeClass('glow').removeClass('clickable');
             self.oB2.removeClass('glow').removeClass('clickable');
             self.oB3.removeClass('glow').removeClass('clickable');
-            self.setCard('#oB2', self.opponent.currentCard.split(' ')[0], self.opponent.currentCard.split(' ')[1]);
+            self.setCard('#oB2',
+                self.opponent.currentCard.split(' ')[0],
+                self.opponent.currentCard.split(' ')[1]);
             self.compareCards();
         });
 
@@ -295,7 +310,9 @@ var Engine = (function(self, $) {
             self.oB1.removeClass('glow').removeClass('clickable');
             self.oB2.removeClass('glow').removeClass('clickable');
             self.oB3.removeClass('glow').removeClass('clickable');
-            self.setCard('#oB3', self.opponent.currentCard.split(' ')[0], self.opponent.currentCard.split(' ')[1]);
+            self.setCard('#oB3',
+                self.opponent.currentCard.split(' ')[0],
+                self.opponent.currentCard.split(' ')[1]);
             self.compareCards();
         });
 
@@ -390,7 +407,7 @@ var Engine = (function(self, $) {
      * Begins the game
      */
     self.play = function() {
-        self.log('Updating screen text and clearing up next turn.');
+        self.log('Updating screen text and clearing up for next turn.');
         self.oDraw.fadeOut('slow');
         self.pDraw.fadeOut('slow');
         self.oChallenge.fadeOut('slow');
@@ -416,14 +433,14 @@ var Engine = (function(self, $) {
      * @param {*} player 
      */
     self.initPlayers = function() {
-        self.player = new Player();
+        self.player = new Player({ wins: self.player.wins || 0 });
         self.player.init({ debug: false, color: 'red' });
         const half = Math.ceil(self.deck.length / 2);
         const redHalfOfDeck = self.deck.splice(half, half);
         self.player.hand = self.player.hand.concat(redHalfOfDeck);
         self.player.hand = self.shuffle(self.player.hand);
 
-        self.opponent = new Player();
+        self.opponent = new Player({ wins: self.opponent.wins || 0 });
         self.opponent.init({ debug: false, color: 'black' });
         self.opponent.hand = self.opponent.hand.concat(self.deck.splice(0, self.deck.length));
         self.opponent.hand = self.shuffle(self.opponent.hand);
@@ -497,6 +514,7 @@ var Engine = (function(self, $) {
         else {
             self.log('challengeFlag: ' + self.challengeFlag);
             if (self.challengeFlag) {
+                // todo: i feel like this may be redundant with the check in pDeck.click
                 self.loseHand();
             } else {
                 self.flavortext.text("You've an opportunity to challenge, click your deck to ignore.");
@@ -595,6 +613,9 @@ var Engine = (function(self, $) {
         self.pBattleCards.push(self.player.hand.shift());
         self.pBattleCards.push(self.player.hand.shift());
         self.player.cardsOnTable = self.player.cardsOnTable.concat(self.pBattleCards);
+
+        self.oCardsInPlay.text(self.opponent.cardsOnTable.length);
+        self.pCardsInPlay.text(self.player.cardsOnTable.length);
 
         // show opponent cards face down
         self.oB1.slideDown('slow', function() {
