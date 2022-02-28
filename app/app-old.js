@@ -149,8 +149,8 @@ var Engine = (function(self, $) {
         "That looked painful."
     ];
     self.challengeMessages = [
-        "Care to challenge?",
-        "Challenge?"
+        "That took guts.",
+        "*GASP* Challenge!?"
     ];
 
     self.shake = function(n, element) {
@@ -215,10 +215,15 @@ var Engine = (function(self, $) {
         self.initDeck();
         self.initPlayers();
 
+        self.pCardsLeft.width(((self.player.hand.length / 26) * 100).toString() + '%');
+        self.pCardsLeft.text(self.player.hand.length + '/26');
+        self.oCardsLeft.width(((self.opponent.hand.length / 26) * 100).toString() + '%');
+        self.oCardsLeft.text(self.opponent.hand.length + '/26');
+
         self.pDeck.click(function() {
             self.log('Player deck clicked.');
             self.log('playerChallengeFlag: ' + self.playerChallengeFlag);
-            if (self.playerChallengeFlag) {
+            if (self.challengeFlag && self.playerChallengeFlag) {
                 self.loseHand();
                 self.challengeFlag = false;
             } else {
@@ -398,8 +403,6 @@ var Engine = (function(self, $) {
         self.pB3.fadeOut('slow');
         self.pwins.text(self.player.wins);
         self.owins.text(self.opponent.wins);
-        self.player.cardsOnTable = [];
-        self.opponent.cardsOnTable = [];
         self.challengeFlag = false;
         self.oCardsInPlay.text(self.opponent.cardsOnTable.length);
         self.pCardsInPlay.text(self.player.cardsOnTable.length);
@@ -461,7 +464,7 @@ var Engine = (function(self, $) {
             }
             self.loseHand();
         }
-        // Player 1 wins, Opponent can challenge 
+        // Player wins, Opponent can challenge 
         else if (parseInt(playerCardValue) > parseInt(opponentCardValue)) {
             // Determine probabilities that Opponent might challenge
             let challengeProbability = Math.floor(Math.random() * (20 - 1) + 1);
@@ -490,8 +493,9 @@ var Engine = (function(self, $) {
                 self.winHand();
             }
         }
-        // Player 2 wins, Player 1 can challenge
+        // Opponent wins, Player can challenge
         else {
+            self.log('challengeFlag: ' + self.challengeFlag);
             if (self.challengeFlag) {
                 self.loseHand();
             } else {
@@ -501,6 +505,7 @@ var Engine = (function(self, $) {
                 self.challengeFlag = true;
                 if (!self.playerChallengeFlag) {
                     self.playerChallengeFlag = !self.playerChallengeFlag;
+                    self.challengeFlag = !self.challengeFlag;
                 }
             }
         }
@@ -519,8 +524,8 @@ var Engine = (function(self, $) {
         // give player cards back
         self.player.hand = self.player.hand.concat(self.player.cardsOnTable);
         self.discard = self.discard.concat(self.opponent.cardsOnTable);
-        self.player.cardsOnTable = 0;
-        self.opponent.cardsOnTable = 0;
+        self.player.cardsOnTable = [];
+        self.opponent.cardsOnTable = [];
         if (self.opponent.hand.length < 1) {
             self.winGame();
         }
@@ -543,8 +548,8 @@ var Engine = (function(self, $) {
         // give opponent cards back
         self.opponent.hand = self.opponent.hand.concat(self.opponent.cardsOnTable);
         self.discard = self.discard.concat(self.player.cardsOnTable);
-        self.player.cardsOnTable = 0;
-        self.opponent.cardsOnTable = 0;
+        self.player.cardsOnTable = [];
+        self.opponent.cardsOnTable = [];
         if (self.player.hand.length < 1) {
             self.loseGame();
         }
@@ -573,6 +578,12 @@ var Engine = (function(self, $) {
     };
 
     self.initBattle = function() {
+        if (self.opponent.hand.length < 3) {
+            self.winGame();
+        }
+        if (self.player.hand.length < 3) {
+            self.loseGame();
+        }
         self.oBattleCards = [];
         self.oBattleCards.push(self.opponent.hand.shift());
         self.oBattleCards.push(self.opponent.hand.shift());
