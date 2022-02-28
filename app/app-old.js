@@ -44,7 +44,7 @@ function Player() {
             };
             self.log('[Player:' + self.number + '.Init] Debugging enabled.');
         }
-        self.wins = options.wins || 0;
+        self.wins = options.wins;
         self.hand = [];
         self.cardsOnTable = [];
         self.currentCard = '';
@@ -211,6 +211,7 @@ var Engine = (function(self, $) {
         self.turnCount = $('turn-count');
         self.gameEnd = false;
         self.playerChallengeFlag = false;
+        self.challengeFlag = false;
 
         self.initDeck();
         self.initPlayers();
@@ -281,6 +282,7 @@ var Engine = (function(self, $) {
         });
 
         self.oB1.click(function() {
+            self.challengeFlag = false;
             self.opponent.currentCard = self.oBattleCards[0];
             self.player.currentCard = self.pBattleCards[Math.floor(Math.random() * self.pBattleCards.length)];
             self.oB1.removeClass('glow').removeClass('clickable');
@@ -293,6 +295,7 @@ var Engine = (function(self, $) {
         });
 
         self.oB2.click(function() {
+            self.challengeFlag = false;
             self.opponent.currentCard = self.oBattleCards[1];
             self.player.currentCard = self.pBattleCards[Math.floor(Math.random() * self.pBattleCards.length)];
             self.oB1.removeClass('glow').removeClass('clickable');
@@ -305,6 +308,7 @@ var Engine = (function(self, $) {
         });
 
         self.oB3.click(function() {
+            self.challengeFlag = false;
             self.opponent.currentCard = self.oBattleCards[2];
             self.player.currentCard = self.pBattleCards[Math.floor(Math.random() * self.pBattleCards.length)];
             self.oB1.removeClass('glow').removeClass('clickable');
@@ -318,7 +322,7 @@ var Engine = (function(self, $) {
 
         self.play();
 
-        self.log('[Engine.Init] Done.');
+        self.log('Init Done.');
     };
 
     self.initDeck = function() {
@@ -596,6 +600,8 @@ var Engine = (function(self, $) {
     };
 
     self.initBattle = function() {
+        // disable challenges
+        self.challengeFlag = true;
         if (self.opponent.hand.length < 3) {
             self.winGame();
         }
