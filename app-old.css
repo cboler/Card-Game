@@ -240,7 +240,7 @@ body {
     line-height: 0.5em;
 }
 
-#progressbar {
+.progressbar {
     background-color: black;
     border-radius: 13px;
     /* (height of inner div) / 2 + padding */
