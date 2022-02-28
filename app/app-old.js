@@ -44,6 +44,7 @@ function Player() {
             };
             self.log('[Player:' + self.number + '.Init] Debugging enabled.');
         }
+        self.log('wins: ' + options.wins);
         self.wins = options.wins;
         self.hand = [];
         self.cardsOnTable = [];
@@ -208,10 +209,11 @@ var Engine = (function(self, $) {
         self.owins = $('#opponent-wins');
         self.oCardsInPlay = $('#opponent-cards-in-play');
         self.pCardsInPlay = $('#player-cards-in-play');
-        self.turnCount = $('turn-count');
+        self.turnCount = $('#turn-count');
         self.gameEnd = false;
         self.playerChallengeFlag = false;
         self.challengeFlag = false;
+        self.turns = 0;
 
         self.initDeck();
         self.initPlayers();
@@ -229,6 +231,9 @@ var Engine = (function(self, $) {
                 self.challengeFlag = false;
             } else {
                 self.turns += 1;
+                self.log('turn: ' + self.turns);
+                self.turnCount.text(self.turns);
+
                 self.player.currentCard = self.player.hand.shift();
                 self.opponent.currentCard = self.opponent.hand.shift();
                 self.player.cardsOnTable.push(self.player.currentCard);
@@ -437,15 +442,17 @@ var Engine = (function(self, $) {
      * @param {*} player 
      */
     self.initPlayers = function() {
-        self.player = new Player({ wins: self.player.wins || 0 });
-        self.player.init({ debug: false, color: 'red' });
+        let playerWins = self.player.wins;
+        let opponentWins = self.opponent.wins;
+        self.player = new Player();
+        self.player.init({ wins: playerWins || 0 });
         const half = Math.ceil(self.deck.length / 2);
         const redHalfOfDeck = self.deck.splice(half, half);
         self.player.hand = self.player.hand.concat(redHalfOfDeck);
         self.player.hand = self.shuffle(self.player.hand);
 
-        self.opponent = new Player({ wins: self.opponent.wins || 0 });
-        self.opponent.init({ debug: false, color: 'black' });
+        self.opponent = new Player({ wins: opponentWins || 0 });
+        self.opponent.init({ wins: opponentWins || 0 });
         self.opponent.hand = self.opponent.hand.concat(self.deck.splice(0, self.deck.length));
         self.opponent.hand = self.shuffle(self.opponent.hand);
     };
