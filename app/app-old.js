@@ -131,14 +131,15 @@ var Engine = (function(self, $) {
     self.flavortext = {};
     self.pwins = {};
     self.owins = {};
+    self.oCardsInPlay = {};
+    self.pCardsInPlay = {};
     self.turns = 0;
     self.oBattleCards = [];
     self.pBattleCards = [];
     self.gameEnd = false;
-    self.oCardsInPlay = {};
-    self.pCardsInPlay = {};
     self.turnCount = {};
     self.playerChallengeFlag = false;
+    self.challengeFlag = false;
     self.winMessages = [
         "It appears you've won.",
         "Good show."
@@ -146,6 +147,10 @@ var Engine = (function(self, $) {
     self.loseMessages = [
         "Ouch.",
         "That looked painful."
+    ];
+    self.challengeMessages = [
+        "Care to challenge?",
+        "Challenge?"
     ];
 
     self.shake = function(n, element) {
@@ -215,6 +220,7 @@ var Engine = (function(self, $) {
             self.log('playerChallengeFlag: ' + self.playerChallengeFlag);
             if (self.playerChallengeFlag) {
                 self.loseHand();
+                self.challengeFlag = false;
             } else {
                 self.turns += 1;
                 self.player.currentCard = self.player.hand.shift();
@@ -238,7 +244,8 @@ var Engine = (function(self, $) {
 
         self.pDraw.click(function() {
             self.log('Drawn card clicked.');
-            self.flavortext.text("Click your deck to draw.");
+            self.challengeFlag = false;
+            self.flavortext.text(self.challengeMessages[Math.floor(Math.random() * self.challengeMessages.length)]);
             self.pDraw.removeClass('glow').removeClass('clickable');
             self.pDeck.removeClass('glow').removeClass('clickable');
             // Challenge initiated
@@ -393,6 +400,7 @@ var Engine = (function(self, $) {
         self.owins.text(self.opponent.wins);
         self.player.cardsOnTable = [];
         self.opponent.cardsOnTable = [];
+        self.challengeFlag = false;
         self.oCardsInPlay.text(self.opponent.cardsOnTable.length);
         self.pCardsInPlay.text(self.player.cardsOnTable.length);
         self.turnCount.text(self.turns);
@@ -457,7 +465,8 @@ var Engine = (function(self, $) {
         else if (parseInt(playerCardValue) > parseInt(opponentCardValue)) {
             // Determine probabilities that Opponent might challenge
             let challengeProbability = Math.floor(Math.random() * (20 - 1) + 1);
-            if (opponentCardValue + challengeProbability > 10) {
+            if (self.challengeFlag && opponentCardValue + challengeProbability > 10) {
+                self.challengeFlag = true;
                 self.flavortext.text("The opponent decided to challenge.");
                 self.opponent.currentCard = self.opponent.hand.shift();
                 self.opponent.cardsOnTable.push(self.opponent.currentCard);
@@ -483,11 +492,16 @@ var Engine = (function(self, $) {
         }
         // Player 2 wins, Player 1 can challenge
         else {
-            self.flavortext.text("You've an opportunity to challenge, click your deck to ignore.");
-            self.pDraw.addClass('glow').addClass('clickable');
-            self.pDeck.addClass('glow').addClass('clickable');
-            if (!self.playerChallengeFlag) {
-                self.playerChallengeFlag = !self.playerChallengeFlag;
+            if (self.challengeFlag) {
+                self.loseHand();
+            } else {
+                self.flavortext.text("You've an opportunity to challenge, click your deck to ignore.");
+                self.pDraw.addClass('glow').addClass('clickable');
+                self.pDeck.addClass('glow').addClass('clickable');
+                self.challengeFlag = true;
+                if (!self.playerChallengeFlag) {
+                    self.playerChallengeFlag = !self.playerChallengeFlag;
+                }
             }
         }
     };
@@ -499,7 +513,7 @@ var Engine = (function(self, $) {
         self.oDraw.fadeOut('slow');
         self.pDraw.fadeOut('slow');
 
-        self.oCardsLeft.attr('width', ((self.opponent.hand.length - 1) * 100).toString() + '%');
+        self.oCardsLeft.width((((self.opponent.hand.length - 1) / 26) * 100).toString() + '%');
         self.oCardsLeft.text(self.opponent.hand.length + '/26');
 
         // give player cards back
@@ -523,7 +537,7 @@ var Engine = (function(self, $) {
         self.oDraw.fadeOut('slow');
         self.pDraw.fadeOut('slow');
 
-        self.pCardsLeft.attr('width', ((self.player.hand.length - 1) * 100).toString() + '%');
+        self.pCardsLeft.width((((self.player.hand.length - 1) / 26) * 100).toString() + '%');
         self.pCardsLeft.text(self.player.hand.length + '/26');
 
         // give opponent cards back

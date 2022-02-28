@@ -243,6 +243,7 @@ body {
 .progressbar {
     background-color: black;
     border-radius: 13px;
+    width: 100%;
     /* (height of inner div) / 2 + padding */
     padding: 3px;
 }
