@@ -5,7 +5,7 @@
     <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Smack.test</title>
-    <script type='text/javascript' src='https://code.jquery.com/jquery-3.6.0.min.js'>
+    <script type='text/javascript' src='jquery-3.6.0.min.js'>
     </script>
     <script type='text/javascript' src='app/app-old.js'>
     </script>
@@ -26,10 +26,10 @@
     <div id='header'>
         <div class='playerframe'>
             <h2>Opponent</h2>
-            <div id='opponent-progressbar'>
+            <div id='opponent-progressbar' class='progressbar'>
                 <div>26/26</div>
             </div>
-            Wins:<span id='opponent-wins'></span>
+            Wins:<span id='opponent-wins'></span><br /> Cards in play:<span id='opponent-cards-in-play'></span>
         </div>
     </div>
 
@@ -69,10 +69,10 @@
     <div id='footer'>
         <div class='playerframe'>
             <h2>Player</h2>
-            <div id='player-progressbar'>
+            <div id='player-progressbar' class='progressbar'>
                 <div>26/26</div>
             </div>
-            Wins:<span id='player-wins'></span>
+            Wins:<span id='player-wins'></span><br /> Cards in play:<span id='player-cards-in-play'></span><br /> Turn: <span id='turn-count'></span>
         </div>
     </div>
 
