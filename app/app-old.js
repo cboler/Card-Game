@@ -137,19 +137,108 @@ var Engine = (function(self, $) {
     self.pBattleCards = [];
     self.gameEnd = false;
     self.turnCount = {};
-    self.playerChallengeFlag = false;
-    self.challengeFlag = false;
+    self.inBattle = false;
+    self.inChallenge = false;
     self.winMessages = [
         "It appears you've won.",
-        "Good show."
+        "Good show.",
+        "Congratulations.",
+        "[POSITIVE ADJECTIVES]",
+        "Wonderful.",
+        "Amazing.",
+        "Impressive.",
+        "Awesome.",
+        "Beautiful.",
+        "ATTAGENDER.",
+        "[AUDIBLE CLAPPING]",
+        "Applause.",
+        "Bravo.",
+        "Take a bow.",
+        "Encore.",
+        "Three cheers.",
+        "[VARIOUS EXCLAMATIONS]",
+        "Woo - Hoo!",
+        "Hooray.",
+        "Yippee.",
+        "Yee - haw!",
+        "Hurrah.",
+        "Huzzah.",
+        "[GESTURES VAGUELY]",
+        "Cheers.",
+        "Hats off to you.",
+        "Here's to you.",
+        "[GOOD]",
+        "Good for you.",
+        "Good on you.",
+        "Good job.",
+        "Great job.",
+        "Excellent job.",
+        "Keep it up.",
+        "Keep up the great work.",
+        "Keep going.",
+        "NICE!",
+        "Nice.",
+        "Noice!",
+        "Noice brah!",
+        "Nice work.",
+        "Nice job.",
+        "Nice one.",
+        "Nice going.",
+        "Nicely done.",
+        "So pleased.",
+        "So proud.",
+        "So Proud!",
+        "So thrilled for you.",
+        "So tickled for you.",
+        "Positively tickled pink.",
+        "Way to go.",
+        "Way to be.",
+        "Way to shine.",
+        "Well done.",
+        "Well deserved.",
+        "This calls for celebrating! Congratulations!"
     ];
     self.loseMessages = [
         "Ouch.",
-        "That looked painful."
+        "That looked painful.",
+        "You tried.",
+        "Loser.",
+        "Good luck to you.",
+        "You're doing your Best.",
+        "God bless you.",
+        "Keep up the good work!.",
+        "What did we learn?",
+        "Your mother also doesn't take losing well.",
+        "[VARIOUS EXCLAMATIONS]",
+        "[GESTURES VAGUELY]",
+        "You lose.",
+        "Not very good at this are we?",
+        "[DERISIVE QUOTE #3]",
+        "Fix your face.",
+        "Jealous?"
     ];
     self.challengeMessages = [
-        "That took guts.",
-        "*GASP* Challenge!?"
+        "[GESTURES TRIUMPHANTLY]",
+        "Mine.",
+        "You only thought you won.",
+        "Pick up your jaw.",
+        "Let it go.",
+        "HA!",
+        "Ha Ha!",
+        "Eat it, suckah!",
+        "You like that!?"
+    ];
+    self.playerChallengeMessages = [
+        "That takes guts.",
+        "[GESTURES Angrily]",
+        "*GASP* Challenge!?",
+        "Just can't let it go, can you?",
+        "Is it worth it?",
+        "What will it cost you?",
+        "You really think you can win?",
+        "It's just not in the cards.",
+        "Go ahead and try.",
+        "Play around and, find out."
     ];
 
     self.shake = function(n, element) {
@@ -208,10 +297,12 @@ var Engine = (function(self, $) {
         self.oCardsInPlay = $('#opponent-cards-in-play');
         self.pCardsInPlay = $('#player-cards-in-play');
         self.turnCount = $('#turn-count');
+        self.playerFrame = $('playerframe');
         self.gameEnd = false;
-        self.playerChallengeFlag = false;
-        self.challengeFlag = false;
-        self.turns = 0;
+        self.turns = 1;
+        self.currentTurn = 0;
+        self.inBattle = false;
+        self.inChallenge = false;
 
         self.initDeck();
         self.initPlayers();
@@ -223,12 +314,14 @@ var Engine = (function(self, $) {
 
         self.pDeck.click(function() {
             self.log('Player deck clicked.');
-            self.log('playerChallengeFlag: ' + self.playerChallengeFlag);
-            if (self.challengeFlag && self.playerChallengeFlag) {
+            if (self.turns === self.currentTurn && self.pDeck.hasClass('glowRed')) {
+                self.pDraw.removeClass('glowGreen').removeClass('clickable');
+                self.pDeck.removeClass('glowRed').removeClass('clickable');
+                self.log('Player declined to challenge.');
                 self.loseHand();
-                self.challengeFlag = false;
             } else {
                 self.turns += 1;
+                self.currentTurn = self.turns;
                 self.log('turn: ' + self.turns);
                 self.turnCount.text(self.turns);
 
@@ -236,10 +329,6 @@ var Engine = (function(self, $) {
                 self.opponent.currentCard = self.opponent.hand.shift();
                 self.player.cardsOnTable.push(self.player.currentCard);
                 self.opponent.cardsOnTable.push(self.opponent.currentCard);
-                self.log('player card');
-                self.log(self.player.currentCard);
-                self.log('opponent card');
-                self.log(self.opponent.currentCard);
 
                 self.oCardsInPlay.text(self.opponent.cardsOnTable.length);
                 self.pCardsInPlay.text(self.player.cardsOnTable.length);
@@ -252,7 +341,7 @@ var Engine = (function(self, $) {
                 self.setCard('#oDraw',
                     self.opponent.currentCard.split(' ')[0],
                     self.opponent.currentCard.split(' ')[1]);
-                self.pDeck.removeClass('glow');
+                self.pDeck.removeClass('glow').removeClass('clickable');
 
                 self.compareCards();
             }
@@ -260,10 +349,9 @@ var Engine = (function(self, $) {
 
         self.pDraw.click(function() {
             self.log('Drawn card clicked.');
-            self.challengeFlag = false;
-            self.flavortext.text(self.challengeMessages[Math.floor(Math.random() * self.challengeMessages.length)]);
-            self.pDraw.removeClass('glow').removeClass('clickable');
-            self.pDeck.removeClass('glow').removeClass('clickable');
+            self.flavortext.text(self.playerChallengeMessages[Math.floor(Math.random() * self.playerChallengeMessages.length)]);
+            self.pDraw.removeClass('glowGreen').removeClass('clickable');
+            self.pDeck.removeClass('glowRed').removeClass('clickable');
 
             // Challenge initiated
             self.player.currentCard = self.player.hand.shift();
@@ -277,6 +365,7 @@ var Engine = (function(self, $) {
             self.clearCard('#pChallenge');
 
             setTimeout(() => {
+                // flip card and compare
                 self.setCard('#pChallenge',
                     self.player.currentCard.split(' ')[0],
                     self.player.currentCard.split(' ')[1]);
@@ -285,25 +374,20 @@ var Engine = (function(self, $) {
         });
 
         self.oB1.click(function() {
-            self.challengeFlag = false;
             self.opponent.currentCard = self.oBattleCards[0];
             self.player.currentCard = self.pBattleCards[Math.floor(Math.random() * self.pBattleCards.length)];
-            self.oB1.removeClass('glow').removeClass('clickable');
-            self.oB2.removeClass('glow').removeClass('clickable');
-            self.oB3.removeClass('glow').removeClass('clickable');
+            self.resetBattleCards();
             self.setCard('#oB1',
                 self.opponent.currentCard.split(' ')[0],
                 self.opponent.currentCard.split(' ')[1]);
+            self.highLightTargetedCard();
             self.compareCards();
         });
 
         self.oB2.click(function() {
-            self.challengeFlag = false;
             self.opponent.currentCard = self.oBattleCards[1];
             self.player.currentCard = self.pBattleCards[Math.floor(Math.random() * self.pBattleCards.length)];
-            self.oB1.removeClass('glow').removeClass('clickable');
-            self.oB2.removeClass('glow').removeClass('clickable');
-            self.oB3.removeClass('glow').removeClass('clickable');
+            self.resetBattleCards();
             self.setCard('#oB2',
                 self.opponent.currentCard.split(' ')[0],
                 self.opponent.currentCard.split(' ')[1]);
@@ -311,12 +395,9 @@ var Engine = (function(self, $) {
         });
 
         self.oB3.click(function() {
-            self.challengeFlag = false;
             self.opponent.currentCard = self.oBattleCards[2];
             self.player.currentCard = self.pBattleCards[Math.floor(Math.random() * self.pBattleCards.length)];
-            self.oB1.removeClass('glow').removeClass('clickable');
-            self.oB2.removeClass('glow').removeClass('clickable');
-            self.oB3.removeClass('glow').removeClass('clickable');
+            self.resetBattleCards();
             self.setCard('#oB3',
                 self.opponent.currentCard.split(' ')[0],
                 self.opponent.currentCard.split(' ')[1]);
@@ -326,6 +407,32 @@ var Engine = (function(self, $) {
         self.play();
 
         self.log('Init Done.');
+    };
+
+    self.resetBattleCards = function() {
+        let battleCards = [
+            self.oB1,
+            self.oB2,
+            self.oB3
+        ];
+        battleCards.forEach((element, index) => {
+            element.removeClass('glowGreen').removeClass('clickable');
+        });
+    };
+
+    self.highLightTargetedCard = function() {
+        let attackedCard = self.pBattleCards.indexOf(self.player.currentCard);
+        switch (attackedCard) {
+            case 0:
+                self.oB1.addClass('glowRed');
+                break;
+            case 1:
+                self.oB2.addClass('glowRed');
+                break;
+            default:
+                self.oB3.addClass('glowRed');
+                break;
+        }
     };
 
     self.initDeck = function() {
@@ -415,24 +522,44 @@ var Engine = (function(self, $) {
      */
     self.play = function() {
         self.log('Updating screen text and clearing up for next turn.');
-        self.oDraw.fadeOut('slow');
-        self.pDraw.fadeOut('slow');
-        self.oChallenge.fadeOut('slow');
-        self.pChallenge.fadeOut('slow');
-        self.oB1.fadeOut('slow');
-        self.pB1.fadeOut('slow');
-        self.oB2.fadeOut('slow');
-        self.pB2.fadeOut('slow');
-        self.oB3.fadeOut('slow');
-        self.pB3.fadeOut('slow');
+
+        let visualElementsToReset = [
+            self.oDeck,
+            self.pDeck,
+            self.oDraw,
+            self.pDraw,
+            self.oChallenge,
+            self.pChallenge,
+            self.oB1,
+            self.pB1,
+            self.oB2,
+            self.pB2,
+            self.oB3,
+            self.pB3
+        ];
+        visualElementsToReset.forEach((element, index) => {
+            if (index <= 1) {
+                element.removeClass('glow')
+                    .removeClass('glowGreen')
+                    .removeClass('clickable');
+            } else {
+                element.removeClass('glow')
+                    .removeClass('glowGreen')
+                    .removeClass('glowRed')
+                    .removeClass('clickable')
+                    .fadeOut('slow');
+            }
+        });
+
         self.pwins.text(self.player.wins);
         self.owins.text(self.opponent.wins);
-        self.challengeFlag = false;
         self.oCardsInPlay.text(self.opponent.cardsOnTable.length);
         self.pCardsInPlay.text(self.player.cardsOnTable.length);
         self.turnCount.text(self.turns);
         self.flavortext.text("Click your deck to draw.");
-        self.pDeck.addClass('glow');
+        self.pDeck.addClass('glow').addClass('clickable');
+        self.inChallenge = false;
+        self.inBattle = false;
     };
 
     /**
@@ -460,12 +587,8 @@ var Engine = (function(self, $) {
      */
     self.compareCards = function() {
         self.log('[compareCards]');
-        self.log(self.player.currentCard);
-        self.log(self.opponent.currentCard);
         let playerCardValue = self.player.currentCard.split(' ')[1];
         let opponentCardValue = self.opponent.currentCard.split(' ')[1];
-        self.log('playerCardValue: ' + playerCardValue);
-        self.log('opponentCardValue: ' + opponentCardValue);
 
         // if card values are the same
         if (playerCardValue === opponentCardValue) {
@@ -492,26 +615,28 @@ var Engine = (function(self, $) {
         }
         // Player wins, Opponent can challenge 
         else if (parseInt(playerCardValue) > parseInt(opponentCardValue)) {
+            self.log('Opponent can challenge.');
             // Determine probabilities that Opponent might challenge
             let challengeProbability = Math.floor(Math.random() * (20 - 1) + 1);
-            if (self.challengeFlag && opponentCardValue + challengeProbability > 10) {
-                self.challengeFlag = true;
-                self.flavortext.text("The opponent decided to challenge.");
+            if (self.turns === self.currentTurn &&
+                !self.inChallenge &&
+                !self.inBattle &&
+                opponentCardValue + challengeProbability > 10) {
+
+                self.log('Opponent decided to challenge.');
+                self.inChallenge = true;
+                self.flavortext.text(self.challengeMessages[Math.floor(Math.random() * self.challengeMessages.length)]);
                 self.opponent.currentCard = self.opponent.hand.shift();
                 self.opponent.cardsOnTable.push(self.opponent.currentCard);
 
                 // show the opponent's card
-                self.oChallenge.slideDown('slow', function() {
-                    $(this).addClass('glow').addClass('clickable');
-                });
+                self.oChallenge.slideDown('slow');
                 self.clearCard('#oChallenge');
 
                 setTimeout(() => {
-                    self.flavortext.text("And...");
                     self.setCard('#oChallenge',
                         self.opponent.currentCard.split(' ')[0],
                         self.opponent.currentCard.split(' ')[1]);
-
                     self.compareCards();
                 }, 2000);
             } else {
@@ -521,27 +646,26 @@ var Engine = (function(self, $) {
         }
         // Opponent wins, Player can challenge
         else {
-            self.log('challengeFlag: ' + self.challengeFlag);
-            if (self.challengeFlag) {
-                // todo: i feel like this may be redundant with the check in pDeck.click
-                self.loseHand();
+            if (!self.inBattle &&
+                !self.inChallenge &&
+                self.turns === self.currentTurn) {
+
+                self.flavortext.text("You can challenge, click your deck to ignore and accept defeat.");
+                self.pDraw.addClass('glowGreen').addClass('clickable');
+                self.pDeck.addClass('glowRed').addClass('clickable');
+                self.log('Player can challenge.');
             } else {
-                self.flavortext.text("You've an opportunity to challenge, click your deck to ignore.");
-                self.pDraw.addClass('glow').addClass('clickable');
-                self.pDeck.addClass('glow').addClass('clickable');
-                self.challengeFlag = true;
-                if (!self.playerChallengeFlag) {
-                    self.playerChallengeFlag = !self.playerChallengeFlag;
-                    self.challengeFlag = !self.challengeFlag;
-                }
+                self.loseHand();
             }
         }
     };
 
     self.winHand = function() {
         // apply visual effects
+        self.pDraw.addClass('glowGreen');
+        self.oDraw.addClass('glowRed');
         self.flavortext.text(self.winMessages[Math.floor(Math.random() * self.winMessages.length)]);
-        self.shake(2, self.oCardsLeft);
+        self.shake(2, self.playerFrame);
         self.oDraw.fadeOut('slow');
         self.pDraw.fadeOut('slow');
 
@@ -559,13 +683,15 @@ var Engine = (function(self, $) {
 
         setTimeout(() => {
             self.play();
-        }, 2000);
+        }, 5000);
     };
 
     self.loseHand = function() {
         // apply visual effects
+        self.pDraw.addClass('glowRed');
+        self.oDraw.addClass('glowGreen');
         self.flavortext.text(self.loseMessages[Math.floor(Math.random() * self.loseMessages.length)]);
-        self.shake(2, self.oCardsLeft);
+        self.shake(2, self.playerFrame);
         self.oDraw.fadeOut('slow');
         self.pDraw.fadeOut('slow');
 
@@ -583,7 +709,7 @@ var Engine = (function(self, $) {
 
         setTimeout(() => {
             self.play();
-        }, 2000);
+        }, 5000);
     };
 
     self.winGame = function() {
@@ -606,13 +732,13 @@ var Engine = (function(self, $) {
 
     self.initBattle = function() {
         // disable challenges
-        self.challengeFlag = true;
         if (self.opponent.hand.length < 3) {
             self.winGame();
         }
         if (self.player.hand.length < 3) {
             self.loseGame();
         }
+        self.inBattle = true;
         self.oBattleCards = [];
         self.oBattleCards.push(self.opponent.hand.shift());
         self.oBattleCards.push(self.opponent.hand.shift());
@@ -630,17 +756,17 @@ var Engine = (function(self, $) {
 
         // show opponent cards face down
         self.oB1.slideDown('slow', function() {
-            $(this).addClass('glow').addClass('clickable');
+            $(this).addClass('glowGreen').addClass('clickable');
         });
         self.clearCard('#oB1');
 
         self.oB2.slideDown('slow', function() {
-            $(this).addClass('glow').addClass('clickable');
+            $(this).addClass('glowGreen').addClass('clickable');
         });
         self.clearCard('#oB2');
 
         self.oB3.slideDown('slow', function() {
-            $(this).addClass('glow').addClass('clickable');
+            $(this).addClass('glowGreen').addClass('clickable');
         });
         self.clearCard('#oB3');
 
@@ -666,7 +792,6 @@ var Engine = (function(self, $) {
      * @param {Object} value: 1-13 or 'ace' - 'king' or 'one' - 'thirteen'
      */
     self.setCard = function(card, suite, value) {
-        self.log('[Engine.setCard] suite: ' + suite + ' value: ' + value);
         if ($(card).length > 0 && (suite == 'spades' || suite == 'clubs' || suite == 'diams' || suite == 'hearts')) {
             $(card).empty();
             switch (value) {
