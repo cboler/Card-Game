@@ -253,7 +253,6 @@ body {
 
 #opponent-progressbar div {
     background-color: green;
-    /* TODO: Should use > 66% green, > 33% orange > 0% red later */
     width: 100%;
     height: 20px;
     border: thin;
@@ -270,7 +269,6 @@ body {
 
 #player-progressbar div {
     background-color: green;
-    /* TODO: Should use > 66% green, > 33% orange > 0% red later */
     width: 100%;
     height: 20px;
     border: thin;

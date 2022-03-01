@@ -72,32 +72,6 @@ var Engine = (function(self, $) {
         debug: false
     };
 
-    self.setCookie = function(c_name, value, exdays) {
-        var exdate = new Date();
-        exdate.setDate(exdate.getDate() + exdays);
-        var c_value = escape(value) + ((exdays == null) ? "" : "; expires=" + exdate.toUTCString());
-        document.cookie = c_name + "=" + c_value;
-    };
-
-    self.getCookie = function(c_name) {
-        var c_value = document.cookie;
-        var c_start = c_value.indexOf(" " + c_name + "=");
-        if (c_start == -1) {
-            c_start = c_value.indexOf(c_name + "=");
-        }
-        if (c_start == -1) {
-            c_value = null;
-        } else {
-            c_start = c_value.indexOf("=", c_start) + 1;
-            var c_end = c_value.indexOf(";", c_start);
-            if (c_end == -1) {
-                c_end = c_value.length;
-            }
-            c_value = unescape(c_value.substring(c_start, c_end));
-        }
-        return c_value;
-    };
-
     /**
      * The set of unused cards that have yet to be dealt.
      */
@@ -307,10 +281,7 @@ var Engine = (function(self, $) {
         self.initDeck();
         self.initPlayers();
 
-        self.pCardsLeft.width(((self.player.hand.length / 26) * 100).toString() + '%');
-        self.pCardsLeft.text(self.player.hand.length + '/26');
-        self.oCardsLeft.width(((self.opponent.hand.length / 26) * 100).toString() + '%');
-        self.oCardsLeft.text(self.opponent.hand.length + '/26');
+        self.updateHealthBars();
 
         self.pDeck.click(function() {
             self.log('Player deck clicked.');
@@ -356,7 +327,6 @@ var Engine = (function(self, $) {
             // Challenge initiated
             self.player.currentCard = self.player.hand.shift();
             self.player.cardsOnTable.push(self.player.currentCard);
-
             self.oCardsInPlay.text(self.opponent.cardsOnTable.length);
             self.pCardsInPlay.text(self.player.cardsOnTable.length);
 
@@ -433,6 +403,29 @@ var Engine = (function(self, $) {
                 self.oB3.addClass('glowRed');
                 break;
         }
+    };
+
+    self.updateHealthBars = function() {
+        let playerPercentage = (self.player.hand.length / 26) * 100;
+        let opponentPercentage = (self.opponent.hand.length / 26) * 100;
+        if (playerPercentage <= 66) {
+            self.pCardsLeft.css('background-color', 'orange');
+        } else if (playerPercentage <= 33) {
+            self.pCardsLeft.css('background-color', 'red');
+        } else {
+            self.pCardsLeft.css('background-color', 'green');
+        }
+        if (opponentPercentage <= 66) {
+            self.oCardsLeft.css('background-color', 'orange');
+        } else if (opponentPercentage <= 33) {
+            self.oCardsLeft.css('background-color', 'red');
+        } else {
+            self.oCardsLeft.css('background-color', 'green');
+        }
+        self.pCardsLeft.width((playerPercentage).toString() + '%');
+        self.pCardsLeft.text(self.player.hand.length + '/26');
+        self.oCardsLeft.width((opponentPercentage).toString() + '%');
+        self.oCardsLeft.text(self.opponent.hand.length + '/26');
     };
 
     self.initDeck = function() {
@@ -622,22 +615,21 @@ var Engine = (function(self, $) {
                 !self.inChallenge &&
                 !self.inBattle &&
                 opponentCardValue + challengeProbability > 10) {
-
                 self.log('Opponent decided to challenge.');
                 self.inChallenge = true;
                 self.flavortext.text(self.challengeMessages[Math.floor(Math.random() * self.challengeMessages.length)]);
-                self.opponent.currentCard = self.opponent.hand.shift();
-                self.opponent.cardsOnTable.push(self.opponent.currentCard);
-
-                // show the opponent's card
-                self.oChallenge.slideDown('slow');
-                self.clearCard('#oChallenge');
-
                 setTimeout(() => {
-                    self.setCard('#oChallenge',
-                        self.opponent.currentCard.split(' ')[0],
-                        self.opponent.currentCard.split(' ')[1]);
-                    self.compareCards();
+                    self.opponent.currentCard = self.opponent.hand.shift();
+                    self.opponent.cardsOnTable.push(self.opponent.currentCard);
+                    // show the opponent's card
+                    self.oChallenge.slideDown('slow');
+                    self.clearCard('#oChallenge');
+                    setTimeout(() => {
+                        self.setCard('#oChallenge',
+                            self.opponent.currentCard.split(' ')[0],
+                            self.opponent.currentCard.split(' ')[1]);
+                        self.compareCards();
+                    }, 2000);
                 }, 2000);
             } else {
                 // If no challenge
@@ -654,6 +646,7 @@ var Engine = (function(self, $) {
                 self.pDraw.addClass('glowGreen').addClass('clickable');
                 self.pDeck.addClass('glowRed').addClass('clickable');
                 self.log('Player can challenge.');
+                self.inChallenge = true;
             } else {
                 self.loseHand();
             }
@@ -667,10 +660,11 @@ var Engine = (function(self, $) {
         self.flavortext.text(self.winMessages[Math.floor(Math.random() * self.winMessages.length)]);
         self.shake(2, self.playerFrame);
         self.oDraw.fadeOut('slow');
+        self.oChallenge.fadeOut('slow');
         self.pDraw.fadeOut('slow');
+        self.pChallenge.fadeOut('slow');
 
-        self.oCardsLeft.width((((self.opponent.hand.length - 1) / 26) * 100).toString() + '%');
-        self.oCardsLeft.text(self.opponent.hand.length + '/26');
+        self.updateHealthBars()
 
         // give player cards back
         self.player.hand = self.player.hand.concat(self.player.cardsOnTable);
@@ -693,10 +687,11 @@ var Engine = (function(self, $) {
         self.flavortext.text(self.loseMessages[Math.floor(Math.random() * self.loseMessages.length)]);
         self.shake(2, self.playerFrame);
         self.oDraw.fadeOut('slow');
+        self.oChallenge.fadeOut('slow');
         self.pDraw.fadeOut('slow');
+        self.pChallenge.fadeOut('slow');
 
-        self.pCardsLeft.width((((self.player.hand.length - 1) / 26) * 100).toString() + '%');
-        self.pCardsLeft.text(self.player.hand.length + '/26');
+        self.updateHealthBars();
 
         // give opponent cards back
         self.opponent.hand = self.opponent.hand.concat(self.opponent.cardsOnTable);
