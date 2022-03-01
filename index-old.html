@@ -13,12 +13,11 @@
     </link>
 </head>
 
-<body style='background-color:#3E955B;'>
+<body>
     <script type='text/javascript'>
         $(document).ready(function() {
             Engine.init({
-                debug: true,
-                game: 'smack'
+                debug: true
             });
         });
     </script>
@@ -29,7 +28,7 @@
             <div id='opponent-progressbar' class='progressbar'>
                 <div>26/26</div>
             </div>
-            Wins:<span id='opponent-wins'></span><br /> Cards in play:<span id='opponent-cards-in-play'></span>
+            Wins: <span id='opponent-wins'></span><br /> Cards in play: <span id='opponent-cards-in-play'></span>
         </div>
     </div>
 
@@ -72,7 +71,7 @@
             <div id='player-progressbar' class='progressbar'>
                 <div>26/26</div>
             </div>
-            Wins:<span id='player-wins'></span><br /> Cards in play:<span id='player-cards-in-play'></span><br /> Turn: <span id='turn-count'></span>
+            Wins: <span id='player-wins'></span><br /> Cards in play: <span id='player-cards-in-play'></span><br /> Turn: <span id='turn-count'></span>
         </div>
     </div>
 

@@ -148,15 +148,15 @@
 }
 
 .glow {
-    -webkit-box-shadow: 0 0 1em lightblue;
-    -moz-box-shadow: 0 0 1em lightblue;
-    box-shadow: 0 0 1em lightblue;
+    -webkit-box-shadow: 0 0 1em blue;
+    -moz-box-shadow: 0 0 1em blue;
+    box-shadow: 0 0 1em blue;
 }
 
 .glowGreen {
-    -webkit-box-shadow: 0 0 1em lightgreen;
-    -moz-box-shadow: 0 0 1em lightgreen;
-    box-shadow: 0 0 1em lightgreen;
+    -webkit-box-shadow: 0 0 1em green;
+    -moz-box-shadow: 0 0 1em green;
+    box-shadow: 0 0 1em green;
 }
 
 .glowRed {
@@ -175,6 +175,10 @@ body {
     height: 100%;
     width: 100%;
     overflow: hidden;
+    background-image: url('res/background.png');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
 }
 
 #typewriter {
@@ -244,15 +248,12 @@ body {
     background-color: black;
     border-radius: 13px;
     width: 100%;
-    /* (height of inner div) / 2 + padding */
     padding: 3px;
 }
 
 #opponent-progressbar div {
     background-color: green;
-    /* Should use > 66% green, > 33% orange > 0% red later */
     width: 100%;
-    /* Adjust with JavaScript */
     height: 20px;
     border: thin;
     border-style: solid;
@@ -268,9 +269,7 @@ body {
 
 #player-progressbar div {
     background-color: green;
-    /* Should use > 66% green, > 33% orange > 0% red later */
     width: 100%;
-    /* Adjust with JavaScript */
     height: 20px;
     border: thin;
     border-style: solid;
