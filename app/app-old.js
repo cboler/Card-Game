@@ -279,7 +279,7 @@ var Engine = (function(self, $) {
                     self.pDraw.removeClass('glowGreen').removeClass('clickable');
                     self.pDeck.removeClass('glowRed').removeClass('clickable');
                     self.log('Player declined to challenge.');
-                    self.loseHand();
+                    self.loseHand(self.pDeck);
                 } else {
                     self.turns += 1;
                     self.currentTurn = self.turns;
@@ -304,7 +304,7 @@ var Engine = (function(self, $) {
                         self.opponent.currentCard.split(' ')[1]);
                     self.pDeck.removeClass('glow').removeClass('clickable');
 
-                    self.compareCards();
+                    self.compareCards(self.pDeck);
                 }
             }
         });
@@ -330,45 +330,56 @@ var Engine = (function(self, $) {
                     self.setCard('#pChallenge',
                         self.player.currentCard.split(' ')[0],
                         self.player.currentCard.split(' ')[1]);
-                    self.compareCards();
+                    self.compareCards(self.pDraw);
                 }, 2000);
             }
         });
 
         self.oB1.click(function() {
             if (self.oB1.hasClass('clickable')) {
+                self.oB1.addClass('glow');
                 self.opponent.currentCard = self.oBattleCards[0];
                 self.player.currentCard = self.pBattleCards[Math.floor(Math.random() * self.pBattleCards.length)];
                 self.resetBattleCards();
-                self.setCard('#oB1',
-                    self.opponent.currentCard.split(' ')[0],
-                    self.opponent.currentCard.split(' ')[1]);
                 self.highLightTargetedCard();
-                self.compareCards();
+                setInterval(() => {
+                    self.setCard('#oB1',
+                        self.opponent.currentCard.split(' ')[0],
+                        self.opponent.currentCard.split(' ')[1]);
+                    self.compareCards(self.oB1);
+                }, 2000);
             }
         });
 
         self.oB2.click(function() {
             if (self.oB2.hasClass('clickable')) {
+                self.oB2.addClass('glow');
                 self.opponent.currentCard = self.oBattleCards[1];
                 self.player.currentCard = self.pBattleCards[Math.floor(Math.random() * self.pBattleCards.length)];
                 self.resetBattleCards();
-                self.setCard('#oB2',
-                    self.opponent.currentCard.split(' ')[0],
-                    self.opponent.currentCard.split(' ')[1]);
-                self.compareCards();
+                self.highLightTargetedCard();
+                self.setInterval(() => {
+                    self.setCard('#oB2',
+                        self.opponent.currentCard.split(' ')[0],
+                        self.opponent.currentCard.split(' ')[1]);
+                    self.compareCards(self.oB2);
+                });
             }
         });
 
         self.oB3.click(function() {
             if (self.oB3.hasClass('clickable')) {
+                self.oB3.addClass('glow');
                 self.opponent.currentCard = self.oBattleCards[2];
                 self.player.currentCard = self.pBattleCards[Math.floor(Math.random() * self.pBattleCards.length)];
                 self.resetBattleCards();
-                self.setCard('#oB3',
-                    self.opponent.currentCard.split(' ')[0],
-                    self.opponent.currentCard.split(' ')[1]);
-                self.compareCards();
+                self.highLightTargetedCard();
+                setInterval(() => {
+                    self.setCard('#oB3',
+                        self.opponent.currentCard.split(' ')[0],
+                        self.opponent.currentCard.split(' ')[1]);
+                    self.compareCards(self.ob3);
+                });
             }
         });
 
@@ -378,39 +389,45 @@ var Engine = (function(self, $) {
     };
 
     /**
-     * Visually resets the battle cards
+     * Visually resets the battle cards and makes them unclickable.
      */
     self.resetBattleCards = function() {
         let battleCards = [
             self.oB1,
             self.oB2,
-            self.oB3
+            self.oB3,
+            self.pB1,
+            self.pB2,
+            self.pB3
         ];
         battleCards.forEach((element, index) => {
-            element.removeClass('glowGreen').removeClass('clickable');
+            element.removeClass('glow')
+                .removeClass('glowGreen')
+                .removeClass('glowRed')
+                .removeClass('clickable');
         });
     };
 
     /**
-     * Highlights the card chosen by an opponent
+     * Highlights the card chosen by an opponent.
      */
     self.highLightTargetedCard = function() {
         let attackedCard = self.pBattleCards.indexOf(self.player.currentCard);
         switch (attackedCard) {
             case 0:
-                self.oB1.addClass('glowRed');
+                self.pB1.addClass('glowRed');
                 break;
             case 1:
-                self.oB2.addClass('glowRed');
+                self.pB2.addClass('glowRed');
                 break;
             default:
-                self.oB3.addClass('glowRed');
+                self.pB3.addClass('glowRed');
                 break;
         }
     };
 
     /**
-     * Updates health bars
+     * Updates health bars.
      */
     self.updateHealthBars = function() {
         let playerPercentage = (self.player.hand.length / 26) * 100;
@@ -436,7 +453,7 @@ var Engine = (function(self, $) {
     };
 
     /**
-     * Sets up the deck
+     * Sets up the deck.
      */
     self.initDeck = function() {
         self.discard = [];
@@ -521,7 +538,7 @@ var Engine = (function(self, $) {
     };
 
     /**
-     * Updates the screen each step
+     * Updates the screen each step.
      */
     self.play = function() {
         self.log('Updating screen text and clearing up for next turn.');
@@ -541,16 +558,12 @@ var Engine = (function(self, $) {
             self.pB3
         ];
         visualElementsToReset.forEach((element, index) => {
-            if (index <= 1) {
-                element.removeClass('glow')
-                    .removeClass('glowGreen')
-                    .removeClass('clickable');
-            } else {
-                element.removeClass('glow')
-                    .removeClass('glowGreen')
-                    .removeClass('glowRed')
-                    .removeClass('clickable')
-                    .fadeOut('slow');
+            element.removeClass('glow')
+                .removeClass('glowGreen')
+                .removeClass('glowRed')
+                .removeClass('clickable');
+            if (index > 1) {
+                element.fadeOut('slow');
             }
         });
 
@@ -566,7 +579,7 @@ var Engine = (function(self, $) {
     };
 
     /**
-     * Initializes players
+     * Initializes players.
      */
     self.initPlayers = function() {
         let playerWins = self.player.wins;
@@ -585,9 +598,9 @@ var Engine = (function(self, $) {
     };
 
     /**
-     * Compare two cards and return a result
+     * Compare two cards and return a result, visually shows that result.
      */
-    self.compareCards = function() {
+    self.compareCards = function(clicked) {
         self.log('[compareCards]');
         let playerCardValue = self.player.currentCard.split(' ')[1];
         let opponentCardValue = self.opponent.currentCard.split(' ')[1];
@@ -602,9 +615,9 @@ var Engine = (function(self, $) {
             // if opponent's card is anything other than 2, win
             if (opponentCardValue === '2') {
                 // no challenge--Player loses
-                self.loseHand();
+                self.loseHand(clicked);
             } else {
-                self.winHand();
+                self.winHand(clicked);
             }
         }
         // If player 2 pulled an ace
@@ -612,9 +625,9 @@ var Engine = (function(self, $) {
             // if opponent's card is anything other than 2, win
             if (playerCardValue === '2') {
                 // no challenge--Opponent loses
-                self.winHand();
+                self.winHand(clicked);
             } else {
-                self.loseHand();
+                self.loseHand(clicked);
             }
         }
         // Player wins, Opponent can challenge 
@@ -639,12 +652,12 @@ var Engine = (function(self, $) {
                         self.setCard('#oChallenge',
                             self.opponent.currentCard.split(' ')[0],
                             self.opponent.currentCard.split(' ')[1]);
-                        self.compareCards();
+                        self.compareCards(clicked);
                     }, 2000);
                 }, 2000);
             } else {
                 // If no challenge
-                self.winHand();
+                self.winHand(clicked);
             }
         }
         // Opponent wins, Player can challenge
@@ -659,17 +672,20 @@ var Engine = (function(self, $) {
                 self.log('Player can challenge.');
                 self.inChallenge = true;
             } else {
-                self.loseHand();
+                self.loseHand(clicked);
             }
         }
     };
 
-    self.winHand = function() {
+    /**
+     * When the player wins
+     */
+    self.winHand = function(card) {
         // apply visual effects
-        self.pDraw.addClass('glowGreen');
+        card.addClass('glowGreen');
         self.oDraw.addClass('glowRed');
         self.flavortext.text(self.winMessages[Math.floor(Math.random() * self.winMessages.length)]);
-        self.shake(6, self.playerFrame);
+        self.shake(10, self.playerFrame);
         // give player cards back
         self.player.hand = self.player.hand.concat(self.player.cardsOnTable);
         // discard the opponent's cards
@@ -694,12 +710,15 @@ var Engine = (function(self, $) {
         }, 5000);
     };
 
-    self.loseHand = function() {
+    /**
+     * when the player loses
+     */
+    self.loseHand = function(card) {
         // apply visual effects
-        self.pDraw.addClass('glowRed');
+        card.addClass('glowRed');
         self.oDraw.addClass('glowGreen');
         self.flavortext.text(self.loseMessages[Math.floor(Math.random() * self.loseMessages.length)]);
-        self.shake(6, self.playerFrame);
+        self.shake(10, self.playerFrame);
         // give opponent cards back
         self.opponent.hand = self.opponent.hand.concat(self.opponent.cardsOnTable);
         // discard the player's cards
@@ -724,6 +743,9 @@ var Engine = (function(self, $) {
         }, 5000);
     };
 
+    /**
+     * when the player wins the game
+     */
     self.winGame = function() {
         self.gameEnd = true;
         self.player.wins += 1;
@@ -733,6 +755,9 @@ var Engine = (function(self, $) {
         }
     };
 
+    /**
+     * When the player loses the game
+     */
     self.loseGame = function() {
         self.gameEnd = true;
         self.opponent.wins += 1;
@@ -742,8 +767,10 @@ var Engine = (function(self, $) {
         }
     };
 
+    /**
+     * Initiates a battle
+     */
     self.initBattle = function() {
-        // disable challenges
         if (self.opponent.hand.length <= 3) {
             self.winGame();
         }
@@ -783,15 +810,15 @@ var Engine = (function(self, $) {
         self.clearCard('#oB3');
 
         // show player cards face up so they can see what's on the line
-        self.pB1.slideDown('slow');
-        self.setCard('#pB1', self.pBattleCards[0].split(' ')[0], self.pBattleCards[0].split(' ')[1]);
-
-        self.pB2.slideDown('slow');
-        self.setCard('#pB2', self.pBattleCards[1].split(' ')[0], self.pBattleCards[1].split(' ')[1]);
-
-        self.pB3.slideDown('slow');
-        self.setCard('#pB3', self.pBattleCards[2].split(' ')[0], self.pBattleCards[2].split(' ')[1]);
-
+        self.pB1.slideDown('slow', function() {
+            self.setCard('#pB1', self.pBattleCards[0].split(' ')[0], self.pBattleCards[0].split(' ')[1]);
+        });
+        self.pB2.slideDown('slow', function() {
+            self.setCard('#pB2', self.pBattleCards[1].split(' ')[0], self.pBattleCards[1].split(' ')[1]);
+        });
+        self.pB3.slideDown('slow', function() {
+            self.setCard('#pB3', self.pBattleCards[2].split(' ')[0], self.pBattleCards[2].split(' ')[1]);
+        });
         // Then wait for decision click done by picking a face-down opponent card
         self.flavortext.text("Select one of your opponent's cards.");
     };
@@ -1024,7 +1051,6 @@ var Engine = (function(self, $) {
      */
     self.clearCard = function(card) {
         if ($(card).length > 0) {
-            self.log('[Engine.clearCard] card cleared.');
             $(card).empty();
         }
     };
