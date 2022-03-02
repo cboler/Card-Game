@@ -326,7 +326,6 @@ var Engine = (function(self, $) {
                 let opponentCardValue = self.opponent.currentCard.split(' ')[1];
                 console.log(playerCardValue + ' vs ' + opponentCardValue);
 
-                self.resetBattleCards();
                 self.highLightTargetedCard();
                 setInterval(() => {
                     self.setCard('#oB1',
@@ -349,7 +348,6 @@ var Engine = (function(self, $) {
                 let opponentCardValue = self.opponent.currentCard.split(' ')[1];
                 console.log(playerCardValue + ' vs ' + opponentCardValue);
 
-                self.resetBattleCards();
                 self.highLightTargetedCard();
                 setInterval(() => {
                     self.setCard('#oB2',
@@ -362,16 +360,16 @@ var Engine = (function(self, $) {
 
         self.oB3.click(function() {
             if (self.oB3.hasClass('clickable')) {
-                let playerCardValue = self.player.currentCard.split(' ')[1];
-                let opponentCardValue = self.opponent.currentCard.split(' ')[1];
-                console.log(playerCardValue + ' vs ' + opponentCardValue);
-
                 self.oB3.addClass('glow');
                 self.opponent.currentCard = self.oBattleCards[2];
                 let choice = Math.floor(Math.random() * self.pBattleCards.length);
                 console.log(choice);
                 self.player.currentCard = self.pBattleCards[choice];
-                self.resetBattleCards();
+
+                let playerCardValue = self.player.currentCard.split(' ')[1];
+                let opponentCardValue = self.opponent.currentCard.split(' ')[1];
+                console.log(playerCardValue + ' vs ' + opponentCardValue);
+
                 self.highLightTargetedCard();
                 setInterval(() => {
                     self.setCard('#oB3',
@@ -609,8 +607,6 @@ var Engine = (function(self, $) {
         let playerHadAnAce = playerCardValue === 1;
         let opponentCardValue = parseInt(self.opponent.currentCard.split(' ')[1]);
         let opponentHadAnAce = opponentCardValue === 1;
-        console.log(playerCardValue + ' vs ' + opponentCardValue);
-
         // If player 1 pulled an ace
         if (playerHadAnAce) {
             // if opponent's card is anything other than 2, win
@@ -629,9 +625,10 @@ var Engine = (function(self, $) {
             }
             opponentCardValue += 13;
         }
+        console.log(playerCardValue + ' vs ' + opponentCardValue);
 
         // if card values are the same
-        if (playerCardValue === opponentCardValue) {
+        if (playerCardValue == opponentCardValue) {
             // draw the next 3 and put them in the B slots for each player
             self.initBattle();
         } else if (playerCardValue > opponentCardValue) {
