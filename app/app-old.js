@@ -327,7 +327,7 @@ var Engine = (function(self, $) {
                 console.log(playerCardValue + ' vs ' + opponentCardValue);
 
                 self.highLightTargetedCard();
-                setInterval(() => {
+                setTimeout(() => {
                     self.setCard('#oB1',
                         self.opponent.currentCard.split(' ')[0],
                         self.opponent.currentCard.split(' ')[1]);
@@ -349,7 +349,7 @@ var Engine = (function(self, $) {
                 console.log(playerCardValue + ' vs ' + opponentCardValue);
 
                 self.highLightTargetedCard();
-                setInterval(() => {
+                setTimeout(() => {
                     self.setCard('#oB2',
                         self.opponent.currentCard.split(' ')[0],
                         self.opponent.currentCard.split(' ')[1]);
@@ -371,7 +371,7 @@ var Engine = (function(self, $) {
                 console.log(playerCardValue + ' vs ' + opponentCardValue);
 
                 self.highLightTargetedCard();
-                setInterval(() => {
+                setTimeout(() => {
                     self.setCard('#oB3',
                         self.opponent.currentCard.split(' ')[0],
                         self.opponent.currentCard.split(' ')[1]);
