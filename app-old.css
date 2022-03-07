@@ -24,6 +24,18 @@
     color: #ff0000;
 }
 
+.red-background {
+    background-color: red;
+}
+
+.orange-background {
+    background-color: orange;
+}
+
+.green-background {
+    background-color: green;
+}
+
 .index {
     font-size: 50%;
     font-weight: bold;

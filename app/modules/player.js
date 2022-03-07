@@ -1,8 +1,9 @@
 export class player {
     constructor(wins) {
-        this.wins = wins;
+        this.wins = +wins || 0;
         this.hand = [];
         this.cardsOnTable = [];
-        this.currentCard = '';
+        this.battleCards = [];
+        this.currentCard = {};
     }
 }
