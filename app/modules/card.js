@@ -1,7 +1,31 @@
 export class card {
     constructor(suite, value) {
-        this.suite = suite;
-        this.value = value;
+        if (this.validateSuite(suite)) {
+            this.suite = suite;
+        } else {
+            throw 'invalid suite';
+        }
+        if (this.validateValue(value)) {
+            this.value = value;
+        } else {
+            throw 'invalid value';
+        }
+    }
+
+    validateSuite = function(suite) {
+        const validSuites = ['spades', 'clubs', 'diams', 'hearts']
+        if (validSuites.includes(suite)) {
+            return true;
+        }
+        return false;
+    }
+
+    validateValue = function(value) {
+        const validValues = [...Array(14).keys()].map(i => i + 1);
+        if (validValues.includes(value)) {
+            return true;
+        }
+        return false;
     }
 
     showCard = function(cardElement) {

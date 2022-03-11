@@ -10,6 +10,7 @@
         "test": "jest"
     },
     "devDependencies": {
+        "@babel/preset-env": "^7.16.11",
         "eslint": "^7.32.0",
         "eslint-config-standard": "^16.0.3",
         "eslint-plugin-import": "^2.25.4",

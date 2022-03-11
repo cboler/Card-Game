@@ -113,34 +113,4 @@ export class opponentinfo {
     displayMessage = function(message) {
         this.dialogue.text(message);
     }
-
-    challenge = function() {
-        let challengeProbability = Math.floor(Math.random() * (20 - 1) + 1) >= 10;
-        if (challengeProbability) {
-            console.log('Opponent decided to challenge.');
-            this.dialogue.text(this.challengeMessages[
-                Math.floor(Math.random() * this.challengeMessages.length)]);
-            // TODO: Other refactoring needs to happen first. I'd like 
-            // 1) the deck and hand to be arrays of card objects
-            // 2) if the card knows it's value, set card should be renamed 
-            // and have a different signature
-            // I have a reference to the card element here, that needs to be
-            // taken into account
-
-            // this.currentCard = this.hand.shift();
-            // this.cardsOnTable.push(this.currentCard);
-            // this.update();
-            // this.currentCard.clearCard('#oChallenge');
-            //     setTimeout(() => {
-            //         self.setCard('#oChallenge',
-            //             self.opponent.currentCard.split(' ')[0],
-            //             self.opponent.currentCard.split(' ')[1]);
-            //         self.compareCards(self.oChallenge);
-            //     }, 2000);
-            return true;
-        }
-        return false;
-    }
-
-
 }
