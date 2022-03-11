@@ -36,6 +36,7 @@ export class display {
         });
     }
 
+    // redundant?
     resetBattleCards = function() {
         let battleCards = [
             this.battleCard1,

@@ -27,6 +27,13 @@ export class smack {
         this.playerinfo.player = new player(playerWins);
         this.opponentinfo.opponent = new opponent(opponentWins);
 
+        this.updateText();
+        this.playerinfo.display.updateText();
+        this.playerinfo.display.updateHealthBar();
+        this.opponentinfo.display.updateText();
+        this.opponentinfo.display.updateHealthBar();
+
+
 
     }
 
