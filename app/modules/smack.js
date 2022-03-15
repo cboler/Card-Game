@@ -1,7 +1,5 @@
 import { player } from './player';
 import { opponent } from './opponent';
-import { playerinfo } from './playerinfo';
-import { opponentinfo } from './opponentInfo';
 import { card } from './card';
 
 export class smack {
@@ -12,8 +10,6 @@ export class smack {
         this.currentTurn = 0;
         this.inBattle = false;
         this.inChallenge = false;
-        this.playerinfo = new playerinfo();
-        this.opponentinfo = new opponentinfo();
         this.turnCount = document.querySelector('#turn-count');
     }
 
@@ -22,19 +18,18 @@ export class smack {
     }
 
     init = function() {
-        let playerWins = this.playerinfo.player.wins;
-        let opponentWins = this.opponentinfo.opponent.wins;
-        this.playerinfo.player = new player(playerWins);
-        this.opponentinfo.opponent = new opponent(opponentWins);
+        let playerWins = this.player.wins;
+        let opponentWins = this.opponent.wins;
+        this.player = new player(playerWins);
+        this.opponent = new opponent(opponentWins);
 
         this.updateText();
-        this.playerinfo.display.updateText();
-        this.playerinfo.display.updateHealthBar();
-        this.opponentinfo.display.updateText();
-        this.opponentinfo.display.updateHealthBar();
+        this.player.display.updateText();
+        this.player.display.updateHealthBar();
+        this.opponent.display.updateText();
+        this.opponent.display.updateHealthBar();
 
-
-
+        // click events?
     }
 
     initDeck = function() {
@@ -49,12 +44,22 @@ export class smack {
     deal = function() {
         const half = Math.ceil(this.deck.length / 2);
         const redHalfOfDeck = this.deck.splice(half, half);
-        this.playerinfo.player.hand = this.playerinfo.player.hand.concat(redHalfOfDeck);
-        this.playerinfo.player.hand = this.shuffle(this.playerinfo.player.hand);
-        this.opponentinfo.opponent.hand = this.opponentinfo.opponent.hand.concat(this.deck.splice(0, this.deck.length));
-        this.opponentinfo.opponent.hand = this.shuffle(this.opponentinfo.opponent.hand);
+        this.player.hand = this.player.hand.concat(redHalfOfDeck);
+        this.player.hand = this.shuffle(this.player.hand);
+        this.opponent.hand = this.opponent.hand.concat(
+            this.deck.splice(0, this.deck.length));
+        this.opponent.hand = this.shuffle(this.opponent.hand);
     }
 
+    /**
+     * Array shuffling function from
+     * http://bost.ocks.org/mike/shuffle/
+     * Credit goes to Mike Bostock 
+     * (http://bost.ocks.org/mike/)
+     * for the implementation
+     * of the Fisher-Yates shuffle.
+     * @param {array} array: the array to shuffle
+     */
     shuffle = function shuffle(array) {
         var m = array.length,
             t, i;

@@ -1,11 +1,6 @@
-import { display } from "./display";
-import { opponent } from "./opponent";
-
-export class opponentinfo {
+export class flavortext {
     constructor() {
-        this.opponent = new opponent();
-        this.display = new display('opponent');
-        this.dialogue = document.querySelector('#flavortext');
+        this.text = document.querySelector('#flavortext');
         this.winMessages = [
             "It appears you've won.",
             "Good show.",
@@ -107,10 +102,37 @@ export class opponentinfo {
             "Go ahead and try.",
             "Play around and, find out."
         ];
-
     }
 
     displayMessage = function(message) {
-        this.dialogue.text(message);
+        this.text.text(message);
+    }
+
+    displayRandomWinMessage = function() {
+        this.text.text(
+            this.winMessages[
+                Math.floor(Math.random() * this.winMessages.length)
+            ]);
+    }
+
+    displayRandomLoseMessage = function() {
+        this.text.text(
+            this.loseMessages[
+                Math.floor(Math.random() * this.loseMessages.length)
+            ]);
+    }
+
+    displayRandomChallengeMessage = function() {
+        this.text.text(
+            this.challengeMessages[
+                Math.floor(Math.random() * this.challengeMessages.length)
+            ]);
+    }
+
+    displayRandomPlayerChallengeMessage = function() {
+        this.text.text(
+            this.playerChallengeMessages[
+                Math.floor(Math.random() * this.playerChallengeMessages.length)
+            ]);
     }
 }
