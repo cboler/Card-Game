@@ -6,6 +6,14 @@
 
 ```mermaid
 
+---
+
+config:
+
+&nbsp; layout: elk
+
+---
+
 flowchart TD
 
 &nbsp;   %% Initialization
